@@ -1,0 +1,280 @@
+/* ==========================================
+   Photo Printing Generator
+   style.css
+========================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#edf2f7;
+    color:#333;
+}
+
+/* Container */
+
+.container{
+    width:100%;
+    min-height:100vh;
+    padding:20px;
+}
+
+/* Header */
+
+header{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+header h1{
+    font-size:34px;
+    color:#0f4c81;
+    font-weight:700;
+}
+
+header p{
+    color:#666;
+    margin-top:6px;
+}
+
+/*Thumbnail*/
+
+.thumbnail-wrapper{
+    max-height:220px;
+    overflow-y:auto;
+    margin-top:15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:10px;
+    background:#fafafa;
+}
+
+#thumbnailContainer{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.thumbnail{
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    border-radius:8px;
+    cursor:pointer;
+    border:2px solid #ddd;
+    transition:0.3s;
+}
+
+.thumbnail:hover{
+    transform:scale(1.05);
+    border-color:#0f4c81;
+}
+
+/* Layout */
+
+.main{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:360px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* Cards */
+
+.card{
+    background:#fff;
+    border-radius:12px;
+    padding:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.card h2{
+    font-size:18px;
+    margin-bottom:12px;
+    color:#0f4c81;
+}
+
+/* Inputs */
+
+input[type=file]{
+    width:100%;
+    padding:10px;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:15px;
+    margin-top:5px;
+}
+
+label{
+    display:block;
+    margin:8px 0;
+    cursor:pointer;
+}
+
+input[type=radio]{
+    margin-right:8px;
+}
+
+/* Buttons */
+
+button{
+    width:100%;
+    border:none;
+    padding:14px;
+    border-radius:8px;
+    margin-top:10px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+/* Edit */
+
+#editBtn{
+    background:#3498db;
+    color:#fff;
+}
+
+#editBtn:hover{
+    background:#2980b9;
+}
+
+/* Preview */
+
+#previewBtn{
+    background:#27ae60;
+    color:#fff;
+}
+
+#previewBtn:hover{
+    background:#1e8449;
+}
+
+/* PDF */
+
+#pdfBtn{
+    background:#e74c3c;
+    color:#fff;
+}
+
+#pdfBtn:hover{
+    background:#c0392b;
+}
+
+/* Image Counter */
+
+#imageCount{
+    margin-top:12px;
+    color:#666;
+    font-size:14px;
+}
+
+/* Preview Panel */
+
+.preview{
+    flex:1;
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    padding:20px;
+}
+
+/* Preview Header */
+
+.previewHeader{
+    border-bottom:1px solid #ddd;
+    padding-bottom:12px;
+    margin-bottom:20px;
+}
+
+.previewHeader h2{
+    color:#0f4c81;
+}
+
+/* Preview Area */
+
+#previewCanvas{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    overflow: auto;
+    padding: 30px;
+    background: #d9d9d9;
+    border-radius: 10px;
+    min-height:900px;
+}
+
+/* Paper */
+
+canvas{
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    background: white;
+}
+
+/* Uploaded Images */
+
+.previewImage{
+
+    border:1px solid #ddd;
+
+    object-fit:cover;
+
+}
+
+/* Responsive */
+
+@media(max-width:1200px){
+
+    .main{
+
+        flex-direction:column;
+
+    }
+
+    .sidebar{
+
+        width:100%;
+
+    }
+
+    .preview{
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    canvas{
+
+        transform:scale(.45);
+
+    }
+
+    header h1{  
+
+        font-size:26px;
+
+    }
+
+}

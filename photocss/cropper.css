@@ -1,0 +1,49 @@
+.crop-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.75);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.crop-box{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:10px;
+
+    width:80%;
+
+    max-width:900px;
+
+}
+
+.crop-box img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+.crop-toolbar{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:15px;
+
+}
