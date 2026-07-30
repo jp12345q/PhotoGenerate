@@ -4,6 +4,7 @@
 
 const Preview = (() => {
 
+
     function init() {
 
         document
@@ -34,18 +35,32 @@ const Preview = (() => {
 
     function refresh() {
 
+        console.log("Preview clicked");
+
         const paperType =
             document.getElementById("paperType").value;
 
+            console.log("Paper:", paperType);
+
         if (paperType === "glossy") {
 
-            Packages.generate();
+            console.log("Running Package.generate()");
+            Package.generate();
 
         } else {
 
+            console.log("Running Layout.arrange()");
             Layout.arrange();
+            console.log("Layout.arrange()");
 
         }
+
+        const canvas = Canvas.getCanvas();
+
+        const objects = canvas.getObjects()
+        .filter(obj => obj.type === "image");
+
+        console.log("Images on canvas:", objects.length);
 
     }
 

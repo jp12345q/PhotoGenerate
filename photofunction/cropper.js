@@ -1,3 +1,7 @@
+/*==========================================
+cropper.js
+==========================================*/
+
 const CropperTool = (() => {
 
     const CropAspect = {
@@ -99,6 +103,7 @@ const CropperTool = (() => {
     function open(){
 
         const canvas = Canvas.getCanvas();
+        console.log("Cropper.open()");
 
         selectedObject = canvas.getActiveObject();
 
@@ -114,14 +119,19 @@ const CropperTool = (() => {
         .getElementById("cropModal")
         .style.display="flex";
 
-        const img =
-        document.getElementById("cropImage");
+        const size = document.getElementById("photoSize").value;
+        
+        const img = document.getElementById("cropImage");
+
+        console.log("Selected Object:", selectedObject);
 
         img.src = selectedObject.getSrc();
 
-        cropper = new Cropper(img,{
+        console.log("Image Source:", img.src);
 
-            aspectRatio: CropAspect[size],
+        cropper = new Cropper(img, {
+
+            aspectRatio: CropAspect[size] || NaN,
 
             viewMode:1,
 
@@ -147,6 +157,7 @@ const CropperTool = (() => {
 
 
         });
+
 
     }
 

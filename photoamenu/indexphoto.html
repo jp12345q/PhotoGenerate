@@ -4,8 +4,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Photo Generate</title>
+
+        <!--Stylesheet-->
         <link rel="stylesheet" href="../photocss/menu.css">
         <link rel="stylesheet" href="../photocss/cropper.css">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,17 +16,11 @@
         <script type="module">import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm";window.removeBackground = removeBackground;</script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        
-        <script src="../photojv/app.js"></script>
+        <!--Libraries-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
-        <!--Features-->
-        <script src="../photojv/guide.js"></script>
-        <script src="../photofunction/preview.js"></script>
-        <script src="../photofunction/pdf.js"></script>
-        
-        <!--Editors-->
-        <script src="../photofunction/background.js"></script>
-        <script src="../photofunction/cropper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
 
         <!--Core-->
         <script src="../photofunction/config.js"></script>
@@ -31,6 +28,19 @@
         <script src="../photofunction\upload.js"></script>
         <script src="../photofunction\layout.js"></script>
         <script src="../photofunction\packages.js"></script>
+
+        <!--Editors-->
+        <script src="../photofunction/background.js"></script>
+        <script src="../photofunction/cropper.js"></script>
+
+        <!--Features-->
+        <script src="../photojv/guides.js"></script>
+        <script src="../photofunction/preview.js"></script>
+        <script src="../photofunction/pdf.js"></script>
+
+        <!--Main-->
+        <script src="../photojv/app.js"></script>
+
 
     </head>
     <body>
@@ -111,18 +121,6 @@
                         <button id="removeBgBtn">
                             Remove Background
                         </button>
-                    </div>
-                    <!--Crop Edit Photo-->
-                    <div class="card">
-                        <h2>Crop Photo</h2>
-                        <label>
-                            <input type="radio" name="crop" value="yes">
-                            Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="crop" value="no">
-                            No
-                        </label>
                     </div>
                     <!--Buttons-->
                     <div class="card">

@@ -6,17 +6,22 @@ const Upload = (()=>{
 
     let imageLibrary=[];
 
-    const fileInput=document.getElementById("photoUpload");
-
-    const counter=document.getElementById("imageCount");
-
-    const thumbContainer=document.getElementById("thumbnailContainer");
+    let fileInput;
+    let counter;
+    let thumbContainer;
 
     function init(){
+        
+        fileInput = document.getElementById("photoUpload");
+        counter = document.getElementById("imageCount");
+        thumbContainer = document.getElementById("thumbnailContainer");
 
-        if(!fileInput) return;
+        if (!fileInput) {
+            console.error("photoUpload input not found.");
+            return;
+        }
 
-        fileInput.addEventListener("change",handleFiles);
+        fileInput.addEventListener("change", handleFiles);
 
     }
 
@@ -39,6 +44,8 @@ const Upload = (()=>{
                     backgroundRemoved: false
                 });
 
+                console.log(imageLibrary.length);
+
                 createThumbnail(imageLibrary[imageLibrary.length-1]);
         
                 updateCounter();
@@ -47,6 +54,8 @@ const Upload = (()=>{
             reader.readAsDataURL(file);
 
         });
+
+        console.log("handleFiles()");
 
     }
 

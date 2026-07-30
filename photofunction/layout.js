@@ -89,6 +89,15 @@ const Layout = (() => {
 
             });
 
+            console.log({
+                left: image.left,
+                top: image.top,
+                width: image.getScaledWidth(),
+                height: image.getScaledHeight(),
+                scaleX: image.scaleX,
+                scaleY: image.scaleY
+            });
+
             // Left-to-right flow
             x += photo.width + spacing;
 
@@ -103,6 +112,8 @@ const Layout = (() => {
         });
 
         canvas.renderAll();
+
+        console.log("Canvas size:", canvas.getWidth(), canvas.getHeight());
 
     }
 

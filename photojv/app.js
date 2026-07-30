@@ -1,3 +1,8 @@
+/*==========================================
+Main
+app.js
+==========================================*/
+
 document.addEventListener("DOMContentLoaded", () => {
 
     Canvas.init();
@@ -6,5 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Background.init();
     Preview.init();
     PDF.init();
+
+    console.log("Upload.init()");
 
 });

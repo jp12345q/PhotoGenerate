@@ -90,6 +90,9 @@ const Canvas = (() => {
 
             canvas.add(img);
 
+            console.log("Canvas Object:", canvas.getObjects().length);
+            console.log(canvas.getObjects());
+
             canvas.setActiveObject(img);
 
             canvas.renderAll();

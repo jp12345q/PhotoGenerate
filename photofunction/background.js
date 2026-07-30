@@ -21,6 +21,7 @@ const Background = (() => {
         const canvas = Canvas.getCanvas();
 
         const image = canvas.getActiveObject();
+        console.log("Active Object:", image);
 
         if (!image || image.type !== "image") {
 
@@ -40,8 +41,12 @@ const Background = (() => {
             const blob = await fetch(image.getSrc())
                 .then(r => r.blob());
 
+                console.log("Calling removeBackground...");
+
             const result =
                 await window.removeBackground(blob);
+                
+                console.log("Background removed.");
 
             const url =
                 URL.createObjectURL(result);
