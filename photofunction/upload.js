@@ -102,7 +102,7 @@ const Upload = (()=>{
 
     function clear(){
 
-        files=[];
+        imageLibrary = [];
 
         thumbContainer.innerHTML="";
 

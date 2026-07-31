@@ -27,9 +27,17 @@ const Canvas = (() => {
 
     function loadPaper(size) {
 
-        currentPaper = size;
+        console.log("loadPaper:", size);
+        console.log(CONFIG.PAPER);
 
+        currentPaper = size;
+    
         const paper = CONFIG.PAPER[size].preview;
+
+        if (!paper) {
+            console.error("Unknown Paper Size", size);
+            return;
+        }
 
         canvas.setWidth(paper.width);
 
@@ -161,6 +169,8 @@ const Canvas = (() => {
             "white",
             canvas.renderAll.bind(canvas)
         );
+
+        Guides.draw();
 
     }
 

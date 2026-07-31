@@ -1,5 +1,6 @@
 /* ==========================================
    layout.js
+   Layout Renderer v2
 ========================================== */
 
 const Layout = (() => {
@@ -8,112 +9,136 @@ const Layout = (() => {
         return mm * 3.7795275591;
     }
 
-    function getPhotoPixelSize(sizeName) {
-
-        const photo = CONFIG.PHOTO[sizeName];
-
-        return {
-
-            width: mmToPx(photo.width),
-
-            height: mmToPx(photo.height)
-
-        };
-
-    }
-
-    function arrange() {
+    async function arrange() {
 
         const canvas = Canvas.getCanvas();
 
-        if (!canvas) return;
+        const images = Upload.getImages();
 
-        const sizeName = document.getElementById("photoSize").value;
-
-        const spacingMM = parseFloat(document.getElementById("spacing").value);
-
-        const spacing = mmToPx(spacingMM);
-
-        const objects = canvas.getObjects().filter(obj => obj.type === "image");
-
-        if (objects.length === 0) return;
-
-        const photo = getPhotoPixelSize(sizeName);
-
-        let x = 20;
-        let y = 20;
-
-        // Default position
-        if (
-            sizeName === "Passport" ||
-            sizeName === "ID" ||
-            sizeName === "Wallet" ||
-            sizeName === "3R"
-        ) {
-
-            x = (canvas.width - photo.width) / 2;
-            y = 20;
-
+        if (!images.length) {
+            alert("Please upload photos first.");
+            return;
         }
 
-        if (
-            sizeName === "5R" ||
-            sizeName === "6R"
-        ) {
+        //--------------------------------------------------
+        // Read Settings
+        //--------------------------------------------------
 
-            x = (canvas.width - photo.height) / 2;
-            y = 20;
+        const paperKey =
+            document.getElementById("paperSize").value;
 
-        }
+        const photoKey =
+            document.getElementById("photoSize").value;
 
-        if (
-            sizeName === "8R"
-        ) {
+        const spacing =
+            mmToPx(
+                Number(
+                    document.getElementById("spacing").value
+                )
+            );
 
-            x = (canvas.width - photo.width) / 2;
-            y = (canvas.height - photo.height) / 2;
+        //--------------------------------------------------
+        // Load Paper
+        //--------------------------------------------------
 
-        }
+        Canvas.loadPaper(paperKey);
 
-        objects.forEach(image => {
+        const paper =
+            CONFIG.PAPER[paperKey].preview;
 
-            image.scaleToWidth(photo.width);
+        const photo =
+            CONFIG.PHOTO[photoKey];
 
-            image.scaleToHeight(photo.height);
+        const photoWidth =
+            mmToPx(photo.width);
 
-            image.set({
+        const photoHeight =
+            mmToPx(photo.height);
 
-                left: x,
+        //--------------------------------------------------
+        // Clear Previous Photos
+        //--------------------------------------------------
 
-                top: y
+        Canvas.clearPhotos();
 
-            });
+        //--------------------------------------------------
+        // Layout Calculation
+        //--------------------------------------------------
 
-            console.log({
-                left: image.left,
-                top: image.top,
-                width: image.getScaledWidth(),
-                height: image.getScaledHeight(),
-                scaleX: image.scaleX,
-                scaleY: image.scaleY
-            });
+        const margin = 20;
 
-            // Left-to-right flow
-            x += photo.width + spacing;
+        const usableWidth =
+            paper.width - margin * 2;
 
-            if (x + photo.width > canvas.width - 20) {
+        const cols = Math.max(
+            1,
+            Math.floor(
+                (usableWidth + spacing) /
+                (photoWidth + spacing)
+            )
+        );
 
-                x = 20;
+        let loaded = 0;
 
-                y += photo.height + spacing;
+        images.forEach((photoData, index) => {
 
-            }
+            fabric.Image.fromURL(
+                photoData.src,
+
+                img => {
+
+                    const col = index % cols;
+                    const row = Math.floor(index / cols);
+
+                    const left =
+                        margin +
+                        col * (photoWidth + spacing);
+
+                    const top =
+                        margin +
+                        row * (photoHeight + spacing);
+
+                    img.set({
+
+                        left,
+                        top,
+
+                        selectable: true,
+
+                        cornerColor: "#3498db",
+                        borderColor: "#3498db",
+                        transparentCorners: false,
+                        cornerSize: 10
+
+                    });
+
+                    img.scaleToWidth(photoWidth);
+                    img.scaleToHeight(photoHeight);
+
+                    canvas.add(img);
+
+                    loaded++;
+
+                    if (loaded === images.length) {
+
+                        canvas.renderAll();
+
+                        console.log(
+                            "Layout Render Complete:",
+                            loaded
+                        );
+
+                    }
+
+                },
+
+                {
+                    crossOrigin: "anonymous"
+                }
+
+            );
 
         });
-
-        canvas.renderAll();
-
-        console.log("Canvas size:", canvas.getWidth(), canvas.getHeight());
 
     }
 

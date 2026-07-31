@@ -44,8 +44,8 @@ const Preview = (() => {
 
         if (paperType === "glossy") {
 
-            console.log("Running Package.generate()");
-            Package.generate();
+            console.log("Running Packages.generate()");
+            Packages.generate();
 
         } else {
 
