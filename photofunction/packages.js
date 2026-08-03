@@ -4,83 +4,13 @@
 
 const Packages = (() => {
 
-    function mmToPx(mm) {
-        return mm * 3.7795275591;
-    }
-
-    function duplicate(source, copies, widthMM, heightMM, startX, startY) {
+    async function generate() {
 
         const canvas = Canvas.getCanvas();
 
-        let x = startX;
-        let y = startY;
+        const images = Upload.getImages();
 
-        const spacing = mmToPx(
-            Number(document.getElementById("spacing").value)
-        );
-
-        const w = mmToPx(widthMM);
-        const h = mmToPx(heightMM);
-
-        for (let i = 0; i < copies; i++) {
-
-            fabric.Image.fromURL(source.src,function(img){
-
-                img.scaleToWidth(w);
-
-                img.scaleToHeight(h);
-
-                img.set({
-
-                    left:x,
-
-                    top:y
-
-                });
-
-                canvas.add(img);
-
-                //canvas.renderAll();
-
-            });
-
-            x += w + spacing;
-
-            if(x + w > canvas.width - 20){
-
-                x = 20;
-
-                y += h + spacing;
-
-            }
-
-        }
-
-    }
-
-    function clearImages(){
-
-        const canvas = Canvas.getCanvas();
-
-        canvas.getObjects().forEach(obj=>{
-
-            if(obj.type==="image"){
-
-                canvas.remove(obj);
-
-            }
-
-        });
-
-    }
-
-    function generate(){
-
-        const canvas = Canvas.getCanvas();
-
-        const images = Upload.getImages().filter(img => img.src);
-
-        if(images.length===0){
+        if (!images.length) {
 
             alert("Upload photo first.");
 
@@ -88,92 +18,170 @@ const Packages = (() => {
 
         }
 
-        const pkg =
-            document.getElementById("package").value;
-
         Canvas.clearPhotos();
 
-        if(pkg==="1x1 Package (10 pcs)"){
+        const paperKey =
+            document.getElementById("paperSize").value;
 
-            packageOneByOne(images);
+        Canvas.loadPaper(paperKey);
 
-        }
+        const paper =
+            CONFIG.PAPER[paperKey].preview;
 
-        else if(pkg==="2x2 Package (6 pcs)"){
+        const packageKey =
+            document.getElementById("photoSize").value;
 
-            packageTwoByTwo(images);
+        const config =
+            CONFIG.PACKAGES[packageKey];
 
-        }
+        if (!config) {
 
-        else if(pkg==="Mixed Package"){
+            alert("Unknown package.");
 
-            mixedPackage(images);
-
-        }
-
-    }
-
-    function packageOneByOne(images){
-
-        if(images.length===1){
-
-            duplicate(images[0],10,25.4,25.4,20,20);
+            return;
 
         }
 
-        else{
+        if (packageKey === "mixed") {
 
-            duplicate(images[0],5,25.4,25.4,20,20);
+            drawMixed(canvas, paper, images[0], config);
 
-            duplicate(images[1],5,25.4,25.4,20,180);
+        } else {
+
+            drawGrid(canvas, paper, images[0], config);
 
         }
 
     }
 
-    function packageTwoByTwo(images){
+    //--------------------------------------------------
 
-        if(images.length===1){
+    function drawGrid(canvas, paper, imageData, config) {
 
-            duplicate(images[0],6,50.8,50.8,20,20);
+        const size =
+            CONFIG.PHOTO[config.photo];
 
-        }
+        const photoWidth =
+            size.width * 3.779527559;
 
-        else{
+        const photoHeight =
+            size.height * 3.779527559;
 
-            duplicate(images[0],3,50.8,50.8,20,20);
+        const totalWidth =
+            config.cols * photoWidth +
+            (config.cols - 1) * config.gap;
 
-            duplicate(images[1],3,50.8,50.8,20,250);
+        const startX =
+            (paper.width - totalWidth) / 2;
+
+        const startY =
+            config.margin;
+
+        let count = 0;
+
+        for (let row = 0; row < config.rows; row++) {
+
+            for (let col = 0; col < config.cols; col++) {
+
+                if (count >= config.copies)
+                    return;
+
+                const left =
+                    startX +
+                    col * (photoWidth + config.gap);
+
+                const top =
+                    startY +
+                    row * (photoHeight + config.gap);
+
+                addPhoto(
+                    canvas,
+                    imageData.src,
+                    left,
+                    top,
+                    photoWidth,
+                    photoHeight
+                );
+
+                count++;
+
+            }
 
         }
 
     }
 
-    function mixedPackage(images){
+    //--------------------------------------------------
 
-        if(images.length===1){
+    function drawMixed(canvas, paper, imageData) {
 
-            duplicate(images[0],4,25.4,25.4,20,20);
+        const photo2 =
+            CONFIG.PHOTO["2x2"];
 
-            duplicate(images[0],4,50.8,50.8,20,180);
+        const photo1 =
+            CONFIG.PHOTO["1x1"];
+
+        const w2 = photo2.width * 3.779527559;
+        const h2 = photo2.height * 3.779527559;
+
+        const w1 = photo1.width * 3.779527559;
+        const h1 = photo1.height * 3.779527559;
+
+        const gap = 8;
+
+        let x = 10;
+
+        for (let i = 0; i < 4; i++) {
+
+            addPhoto(canvas, imageData.src, x, 10, w2, h2);
+
+            x += w2 + gap;
 
         }
 
-        else{
+        x = 10;
 
-            duplicate(images[0],2,25.4,25.4,20,20);
+        for (let i = 0; i < 4; i++) {
 
-            duplicate(images[0],2,50.8,50.8,20,150);
+            addPhoto(canvas, imageData.src, x, h2 + 20, w1, h1);
 
-            duplicate(images[1],2,25.4,25.4,350,20);
-
-            duplicate(images[1],2,50.8,50.8,350,150);
+            x += w1 + gap;
 
         }
 
     }
 
-    return{
+    //--------------------------------------------------
+
+    function addPhoto(canvas, src, left, top, width, height) {
+
+        fabric.Image.fromURL(src, img => {
+
+            img.set({
+
+                left,
+
+                top,
+
+                selectable: true
+
+            });
+
+            img.scaleToWidth(width);
+
+            img.scaleToHeight(height);
+
+            canvas.add(img);
+
+            canvas.renderAll();
+
+        });
+
+    }
+
+    //--------------------------------------------------
+
+    return {
 
         generate
 

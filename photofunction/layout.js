@@ -98,22 +98,42 @@ const Layout = (() => {
                         margin +
                         row * (photoHeight + spacing);
 
+                    const scale = Math.max(
+                        photoWidth / img.width,
+                        photoHeight / img.height
+                    );
+
+                    img.scale(scale);
+
                     img.set({
 
-                        left,
-                        top,
+                        left: left + (photoWidth - img.getScaledWidth()) / 2,
+
+                        top: top + (photoHeight - img.getScaledHeight()) / 2,
 
                         selectable: true,
 
-                        cornerColor: "#3498db",
-                        borderColor: "#3498db",
+                        cornerColor: "#000000",
+                        borderColor: "#000000",
                         transparentCorners: false,
                         cornerSize: 10
 
                     });
 
-                    img.scaleToWidth(photoWidth);
-                    img.scaleToHeight(photoHeight);
+                    // Crop everything outside the frame
+                    img.clipPath = new fabric.Rect({
+
+                        left: left,
+                        top: top,
+
+                        width: photoWidth,
+                        height: photoHeight,
+
+                        absolutePositioned: true,
+
+                        fit: "cover"
+
+                    });
 
                     canvas.add(img);
 

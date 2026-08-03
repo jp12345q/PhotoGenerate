@@ -135,7 +135,7 @@ const CONFIG = {
 
     GUIDE:{
 
-        safe:"#2196f3",
+        safe:"#ffffff",
 
         bleed:"#ff5252",
 
@@ -145,5 +145,67 @@ const CONFIG = {
     MAX_UPLOAD:50,
 
     ACCEPTED:["image/jpeg","image/png"]
+
+};
+
+/* ==========================================
+   Glossy Package Templates
+========================================== */
+
+CONFIG.PACKAGES = {
+
+    "2x2": {
+
+        photo: "2x2",
+
+        rows: 2,
+
+        cols: 3,
+
+        copies: 6,
+
+        margin: 15,
+
+        gap: 8
+
+    },
+
+    "1x1": {
+
+        photo: "1x1",
+
+        rows: 2,
+
+        cols: 5,
+
+        copies: 10,
+
+        margin: 10,
+
+        gap: 6
+
+    },
+
+    "mixed": {
+
+        margin: 10,
+
+        gap: 6,
+
+        items: [
+
+            { photo: "2x2" },
+            { photo: "2x2" },
+            { photo: "2x2" },
+            { photo: "2x2" },
+
+            { photo: "1x1" },
+            { photo: "1x1" },
+            { photo: "1x1" },
+            { photo: "1x1" }
+
+        ]
+
+    }
 
 };
