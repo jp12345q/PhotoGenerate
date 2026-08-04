@@ -78,87 +78,43 @@ const Layout = (() => {
             )
         );
 
-        let loaded = 0;
-
         images.forEach((photoData, index) => {
 
-            fabric.Image.fromURL(
-                photoData.src,
+            const col = index % cols;
+            const row = Math.floor(index / cols);
 
-                img => {
+            const left =
+                margin +
+                col * (photoWidth + spacing);
 
-                    const col = index % cols;
-                    const row = Math.floor(index / cols);
+            const top =
+                margin +
+                row * (photoHeight + spacing);
 
-                    const left =
-                        margin +
-                        col * (photoWidth + spacing);
+            Canvas.addPhoto({
 
-                    const top =
-                        margin +
-                        row * (photoHeight + spacing);
+                src: photoData.src,
 
-                    const scale = Math.max(
-                        photoWidth / img.width,
-                        photoHeight / img.height
-                    );
+                left,
 
-                    img.scale(scale);
+                top,
 
-                    img.set({
+                width: photoWidth,
 
-                        left: left + (photoWidth - img.getScaledWidth()) / 2,
+                height: photoHeight,
 
-                        top: top + (photoHeight - img.getScaledHeight()) / 2,
+                fit: "cover"
 
-                        selectable: true,
-
-                        cornerColor: "#000000",
-                        borderColor: "#000000",
-                        transparentCorners: false,
-                        cornerSize: 10
-
-                    });
-
-                    // Crop everything outside the frame
-                    img.clipPath = new fabric.Rect({
-
-                        left: left,
-                        top: top,
-
-                        width: photoWidth,
-                        height: photoHeight,
-
-                        absolutePositioned: true,
-
-                        fit: "cover"
-
-                    });
-
-                    canvas.add(img);
-
-                    loaded++;
-
-                    if (loaded === images.length) {
-
-                        canvas.renderAll();
-
-                        console.log(
-                            "Layout Render Complete:",
-                            loaded
-                        );
-
-                    }
-
-                },
-
-                {
-                    crossOrigin: "anonymous"
-                }
-
-            );
+            });
 
         });
+
+        canvas.renderAll();
+
+        console.log(
+            "Layout Render Complete:",
+            images.length
+        );
 
     }
 

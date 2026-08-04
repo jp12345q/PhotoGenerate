@@ -94,14 +94,21 @@ const Packages = (() => {
                     startY +
                     row * (photoHeight + config.gap);
 
-                addPhoto(
-                    canvas,
-                    imageData.src,
+                Canvas.addPhoto({
+
+                    src: imageData.src,
+
                     left,
+
                     top,
-                    photoWidth,
-                    photoHeight
-                );
+
+                    width: photoWidth,
+
+                    height: photoHeight,
+
+                    fit: "cover"
+
+                });
 
                 count++;
 
@@ -113,69 +120,76 @@ const Packages = (() => {
 
     //--------------------------------------------------
 
-    function drawMixed(canvas, paper, imageData) {
+    function drawMixed(canvas, paper, images) {
 
-        const photo2 =
-            CONFIG.PHOTO["2x2"];
+        const p2 = CONFIG.PHOTO["2x2"];
+        const p1 = CONFIG.PHOTO["1x1"];
 
-        const photo1 =
-            CONFIG.PHOTO["1x1"];
+        const w2 = p2.width * 3.779527559;
+        const h2 = p2.height * 3.779527559;
 
-        const w2 = photo2.width * 3.779527559;
-        const h2 = photo2.height * 3.779527559;
-
-        const w1 = photo1.width * 3.779527559;
-        const h1 = photo1.height * 3.779527559;
+        const w1 = p1.width * 3.779527559;
+        const h1 = p1.height * 3.779527559;
 
         const gap = 8;
+        const rowGap = 20;
 
-        let x = 10;
+        const topWidth = (w2 * 4) + gap * 3;
+        const bottomWidth = (w1 * 4) + gap * 3;
+
+        const topX = (paper.width - topWidth) / 2;
+        const bottomX = (paper.width - bottomWidth) / 2;
+
+        const topY = 20;
+        const bottomY = topY + h2 + rowGap;
+
+        // First uploaded photo -> 2x2 row
+        const first = images[0];
 
         for (let i = 0; i < 4; i++) {
 
-            addPhoto(canvas, imageData.src, x, 10, w2, h2);
+            Canvas.addPhoto({
 
-            x += w2 + gap;
+                src: first.src,
 
-        }
+                left: topX + i * (w2 + gap),
 
-        x = 10;
+                top: topY,
 
-        for (let i = 0; i < 4; i++) {
+                width: w2,
 
-            addPhoto(canvas, imageData.src, x, h2 + 20, w1, h1);
+                height: h2,
 
-            x += w1 + gap;
-
-        }
-
-    }
-
-    //--------------------------------------------------
-
-    function addPhoto(canvas, src, left, top, width, height) {
-
-        fabric.Image.fromURL(src, img => {
-
-            img.set({
-
-                left,
-
-                top,
-
-                selectable: true
+                fit: "cover"
 
             });
 
-            img.scaleToWidth(width);
+        }
 
-            img.scaleToHeight(height);
+        // Second uploaded photo (if available)
+        const second = images.length > 1
+            ? images[1]
+            : first;
 
-            canvas.add(img);
+        for (let i = 0; i < 4; i++) {
 
-            canvas.renderAll();
+            Canvas.addPhoto({
 
-        });
+                src: second.src,
+
+                left: bottomX + i * (w1 + gap),
+
+                top: bottomY,
+
+                width: w1,
+
+                height: h1,
+
+                fit: "cover"
+
+            });
+
+        }
 
     }
 

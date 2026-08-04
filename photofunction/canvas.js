@@ -32,12 +32,17 @@ const Canvas = (() => {
 
         currentPaper = size;
     
-        const paper = CONFIG.PAPER[size].preview;
+        const config = CONFIG.PAPER[size];
 
-        if (!paper) {
-            console.error("Unknown Paper Size", size);
+        if (!config) {
+
+            console.error("Unknown Paper Size:", size);
+
             return;
+
         }
+
+        const paper = config.preview;
 
         canvas.setWidth(paper.width);
 
@@ -74,42 +79,111 @@ const Canvas = (() => {
 
     }
 
-    function addImage(src) {
+/* ==========================================
+   Draw Photo
+========================================== */
 
-        fabric.Image.fromURL(src,function(img){
+    function addPhoto({
 
-            img.set({
+        src,
+        left,
+        top,
+        width,
+        height,
+        fit = "cover"
 
-                left:60,
+    }) {
 
-                top:60,
+        fabric.Image.fromURL(
 
-                cornerColor:"#3498db",
+            src,
 
-                borderColor:"#3498db",
+            function (img) {
 
-                cornerSize:10,
+                //--------------------------------------------------
+                // Cover Fit
+                //--------------------------------------------------
 
-                transparentCorners:false
+                let scale;
 
-            });
+                if (fit === "cover") {
 
-            img.scaleToWidth(180);
+                    scale = Math.max(
+                        width / img.width,
+                        height / img.height
+                    );
 
-            canvas.add(img);
+                } else if (fit === "contain") {
 
-            console.log("Canvas Object:", canvas.getObjects().length);
-            console.log(canvas.getObjects());
+                    scale = Math.min(
+                        width / img.width,
+                        height / img.height
+                    );
 
-            canvas.setActiveObject(img);
+                } else {
 
-            canvas.renderAll();
+                    scale = width / img.width;
 
-        },{
+                }
 
-            crossOrigin:"anonymous"
+                img.scale(scale);
 
-        });
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+
+                //--------------------------------------------------
+                // Center inside frame
+                //--------------------------------------------------
+
+                img.set({
+
+                    left:
+                        left +
+                        (width - scaledWidth) / 2,
+
+                    top:
+                        top +
+                        (height - scaledHeight) / 2,
+
+                    selectable: false,
+                    evented: false,
+
+                    hasBorders: false,
+                    hasControls: false,
+
+                    objectCaching: false
+
+                });
+
+                //--------------------------------------------------
+                // Crop Frame
+                //--------------------------------------------------
+
+                img.clipPath = new fabric.Rect({
+
+                    left,
+                    top,
+
+                    width,
+                    height,
+
+                    absolutePositioned: true
+
+                });
+
+                canvas.add(img);
+
+                canvas.renderAll();
+
+            },
+
+            {
+
+                crossOrigin: "anonymous"
+
+            }
+
+        );
 
     }
 
@@ -222,7 +296,7 @@ const Canvas = (() => {
 
         loadPaper,
 
-        addImage,
+        addPhoto,
 
         removeSelected,
 

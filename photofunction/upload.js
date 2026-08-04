@@ -87,7 +87,7 @@ const Upload = (()=>{
         img.className = "thumbnail";
 
         img.onclick = function () {
-            Canvas.addImage(photo.src);
+            Canvas.addPhoto(photo.src);
         };
 
         thumbContainer.appendChild(img);
