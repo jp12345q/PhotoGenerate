@@ -80,7 +80,7 @@
                         </select>
                     </div>
                     <!--Edited Photo Size Section-->
-                    <div class="card">
+                    <div class="card" id="photoSizeGroup">
                         <h2>Photo Size</h2>
                         <select id="photoSize">
                             <option>1x1</option>
@@ -96,7 +96,7 @@
                         </select>
                     </div>
                     <!--Package Section-->
-                    <div class="card">
+                    <div class="card" id="packageGroup">
                         <h2>Glossy Package</h2>
                         <select id="package">
                             <option value="">None</option>
@@ -106,14 +106,26 @@
                         </select>
                     </div>
                     <!--Photo Gap-->
-                    <div class="card">
-                        <h2>Photo Spacing</h2>
-                        <select id="spacing">
-                            <option value="1">1 mm</option>
-                            <option value="2">2 mm</option>
-                            <option value="3">3 mm</option>
-                            <option value="5">5 mm</option>
-                        </select>
+                    <div class="card" id="plainOptions">
+                        <h2>Layout</h2>
+                        <div class="form-group">
+                            <label>Rows</label>
+                            <input
+                                type="number"
+                                id="rows"
+                                min="1"
+                                max="20"
+                                value="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Columns</label>
+                            <input
+                                type="number"
+                                id="columns"
+                                min="1"
+                                max="20"
+                                value="2">
+                        </div>
                     </div>
                     <!--Photo Remove Background-->
                     <div class="card">

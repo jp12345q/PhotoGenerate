@@ -20,7 +20,11 @@ const Preview = (() => {
             .addEventListener("change", refresh);
 
         document
-            .getElementById("spacing")
+            .getElementById("rows")
+            .addEventListener("change", refresh);
+
+        document
+            .getElementById("columns")
             .addEventListener("change", refresh);
 
         document

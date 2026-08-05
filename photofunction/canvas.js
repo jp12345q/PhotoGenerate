@@ -30,6 +30,9 @@ const Canvas = (() => {
         console.log("loadPaper:", size);
         console.log(CONFIG.PAPER);
 
+        if (currentPaper === size)
+            return;
+
         currentPaper = size;
     
         const config = CONFIG.PAPER[size];
@@ -48,12 +51,11 @@ const Canvas = (() => {
 
         canvas.setHeight(paper.height);
 
-        canvas.setBackgroundColor("white", canvas.renderAll.bind(canvas));
-
-        Guides.draw();
+        canvas.setBackgroundColor("white", canvas.renderAll.bind(canvas)); 
 
     }
 
+/*
     function drawMargin() {
 
         const margin = new fabric.Rect({
@@ -78,6 +80,7 @@ const Canvas = (() => {
         margin.sendToBack();
 
     }
+*/
 
 /* ==========================================
    Draw Photo
@@ -146,12 +149,16 @@ const Canvas = (() => {
                         (height - scaledHeight) / 2,
 
                     selectable: false,
+
                     evented: false,
 
                     hasBorders: false,
+
                     hasControls: false,
 
-                    objectCaching: false
+                    objectCaching: false,
+
+                    photo: true
 
                 });
 
@@ -173,7 +180,35 @@ const Canvas = (() => {
 
                 canvas.add(img);
 
-                canvas.renderAll();
+                console.log(
+                    "Scaled:",
+                    img.getScaledWidth(),
+                    img.getScaledHeight()
+                );
+
+                canvas.requestRenderAll();
+
+                canvas.getObjects().forEach((obj, i) => {
+
+                    console.log(
+
+                        i,
+
+                        obj.type,
+
+                        obj.photo,
+
+                        obj.left,
+
+                        obj.top,
+
+                        obj.getScaledWidth(),
+
+                        obj.getScaledHeight()
+
+                    );
+
+                });
 
             },
 
@@ -248,39 +283,43 @@ const Canvas = (() => {
 
     }
 
-    function clearPhotos(){
+    function clearPhotos() {
 
-        canvas.getObjects().forEach(obj=>{
+        canvas.getObjects().forEach(obj => {
 
-            if(obj.type==="image"){
+            if (obj.photo === true) {
+
                 canvas.remove(obj);
+
             }
 
         });
 
-        canvas.renderAll();
-
     }
 
-    function fitCanvas(){
+    function fitCanvas() {
 
-        const wrapper=document.getElementById("previewCanvas");
+        const wrapper = document.getElementById("previewCanvas");
 
-        if(!wrapper) return;
+        if (!wrapper || !canvas)
+            return;
 
-        const maxWidth=wrapper.clientWidth-40;
+        const paper = CONFIG.PAPER[currentPaper].preview;
 
-        const scale=maxWidth/canvas.width;
+        const maxWidth = wrapper.clientWidth - 40;
 
-        canvas.setZoom(scale);
+        const scale = Math.min(maxWidth / paper.width, 1);
 
         canvas.setDimensions({
 
-            width:canvas.width*scale,
-
-            height:canvas.height*scale
+            width: paper.width * scale,
+            height: paper.height * scale
 
         });
+
+        canvas.setZoom(scale);
+
+        canvas.requestRenderAll();
 
     }
 
@@ -290,13 +329,45 @@ const Canvas = (() => {
 
     }
 
+    function begin(){
+
+        clearPhotos();
+
+    }
+    
+    function finish(){
+
+        canvas.requestRenderAll();
+
+    }
+
+    function refresh(){
+        canvas.requestRenderAll();
+    }
+
+    function exportImage(){
+        return canvas.toDataURL({
+            multiplier:2
+        });
+    }
+
     return{
 
         init,
 
         loadPaper,
 
+        begin,
+
+        finish,
+
+        refresh,
+
         addPhoto,
+
+        clearCanvas,
+
+        clearPhotos,
 
         removeSelected,
 
@@ -304,11 +375,9 @@ const Canvas = (() => {
 
         rotateSelected,
 
-        clearCanvas,
+        getCanvas,
 
-        clearPhotos,
-
-        getCanvas
+        exportImage
 
     };
 

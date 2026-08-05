@@ -24,18 +24,18 @@ const Layout = (() => {
         // Read Settings
         //--------------------------------------------------
 
-        const paperKey =
-            document.getElementById("paperSize").value;
+        const paperKey = document.getElementById("paperSize").value;
+        const photoKey = document.getElementById("photoSize").value;
 
-        const photoKey =
-            document.getElementById("photoSize").value;
+        const rows = Math.max(
+            1,
+            Number(document.getElementById("rows").value)
+        );
 
-        const spacing =
-            mmToPx(
-                Number(
-                    document.getElementById("spacing").value
-                )
-            );
+        const cols = Math.max(
+            1,
+            Number(document.getElementById("columns").value)
+        );
 
         //--------------------------------------------------
         // Load Paper
@@ -43,78 +43,98 @@ const Layout = (() => {
 
         Canvas.loadPaper(paperKey);
 
-        const paper =
-            CONFIG.PAPER[paperKey].preview;
+        const paper = CONFIG.PAPER[paperKey].preview;
 
-        const photo =
-            CONFIG.PHOTO[photoKey];
+        const photo = CONFIG.PHOTO[photoKey];
 
-        const photoWidth =
-            mmToPx(photo.width);
+        const photoWidth = mmToPx(photo.width);
+        const photoHeight = mmToPx(photo.height);
 
-        const photoHeight =
-            mmToPx(photo.height);
+        Canvas.begin();
 
         //--------------------------------------------------
-        // Clear Previous Photos
+        // Margins
         //--------------------------------------------------
 
-        Canvas.clearPhotos();
-
-        //--------------------------------------------------
-        // Layout Calculation
-        //--------------------------------------------------
-
-        const margin = 20;
+        const margin = CONFIG.LAYOUT.margin;
+        const gap = CONFIG.LAYOUT.gap;
 
         const usableWidth =
             paper.width - margin * 2;
 
-        const cols = Math.max(
-            1,
-            Math.floor(
-                (usableWidth + spacing) /
-                (photoWidth + spacing)
-            )
-        );
+        const usableHeight =
+            paper.height - margin * 2;
 
-        images.forEach((photoData, index) => {
+        //--------------------------------------------------
+        // Auto spacing
+        //--------------------------------------------------
 
-            const col = index % cols;
-            const row = Math.floor(index / cols);
+        const spacingX =
+            cols > 1
+                ? (usableWidth - (cols * photoWidth)) / (cols - 1)
+                : 0;
 
-            const left =
-                margin +
-                col * (photoWidth + spacing);
+        const spacingY =
+            rows > 1
+                ? (usableHeight - (rows * photoHeight)) / (rows - 1)
+                : 0;
 
-            const top =
-                margin +
-                row * (photoHeight + spacing);
+        //--------------------------------------------------
+        // Draw Grid
+        //--------------------------------------------------
 
-            Canvas.addPhoto({
+        let index = 0;
 
-                src: photoData.src,
+        for (let row = 0; row < rows; row++) {
 
-                left,
+            for (let col = 0; col < cols; col++) {
 
-                top,
+                if (index >= images.length)
+                    break;
 
-                width: photoWidth,
+                const left =
+                    margin +
+                    col * (photoWidth + spacingX);
 
-                height: photoHeight,
+                const top =
+                    margin +
+                    row * (photoHeight + spacingY);
 
-                fit: "cover"
+                console.log(
+                    "Drawing Photo",
+                    {
+                        index,
+                        src: images[index].src,
+                        left,
+                        top,
+                        width: photoWidth,
+                        height: photoHeight
+                    }
+                );
 
-            });
+                Canvas.addPhoto({
 
-        });
+                    src: images[index].src,
 
-        canvas.renderAll();
+                    left,
 
-        console.log(
-            "Layout Render Complete:",
-            images.length
-        );
+                    top,
+
+                    width: photoWidth,
+
+                    height: photoHeight,
+
+                    fit: "cover"
+
+                });
+
+                index++;
+
+            }
+
+        }
+        
+        Canvas.finish();
 
     }
 

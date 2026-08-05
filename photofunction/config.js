@@ -139,7 +139,7 @@ const CONFIG = {
 
         bleed:"#ff5252",
 
-        cut:"#00c853"
+        cut:"#070707"
     },
 
     MAX_UPLOAD:50,
@@ -207,5 +207,13 @@ CONFIG.PACKAGES = {
         ]
 
     }
+
+};
+
+CONFIG.LAYOUT = {
+
+    margin: 20,
+
+    gap: 10
 
 };
