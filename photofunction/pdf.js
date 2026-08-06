@@ -1,160 +1,272 @@
 /* ==========================================
    pdf.js
+   Multi-page PDF Export
 ========================================== */
 
-const PDF = (()=>{
+const PDF = (() => {
 
-    function init(){
+    let exporting = false;
 
-        document
-        .getElementById("pdfBtn")
-        .addEventListener("click",exportPDF);
+    function init() {
+
+        const pdfButton =
+            document.getElementById("pdfBtn");
+
+        if (!pdfButton) {
+            console.error("pdfBtn not found.");
+            return;
+        }
+
+        pdfButton.addEventListener(
+            "click",
+            exportPDF
+        );
 
     }
 
-    async function exportPDF(){
+    async function exportPDF() {
 
-        const canvas =
-            Canvas.getCanvas();
+        if (exporting) {
+            return;
+        }
 
-        const paper =
-            document.getElementById("paperSize").value
-            .toUpperCase();
+        const images = Upload.getImages();
 
-        const printSize =
-            CONFIG.PAPER[paper].print;
+        if (!images.length) {
+            alert("Please upload photos first.");
+            return;
+        }
 
-        const exportCanvas =
-            document.createElement("canvas");
+        const paperType =
+            document.getElementById("paperType").value;
 
-        exportCanvas.width =
-            printSize.width;
+        const button =
+            document.getElementById("pdfBtn");
 
-        exportCanvas.height =
-            printSize.height;
+        exporting = true;
+        button.disabled = true;
+        button.textContent = "Creating PDF...";
 
-        const ctx =
-            exportCanvas.getContext("2d");
+        try {
 
-        ctx.fillStyle="white";
+            if (paperType === "glossy") {
 
-        ctx.fillRect(
-            0,
-            0,
-            exportCanvas.width,
-            exportCanvas.height
-        );
+                // Glossy packages currently use one page.
+                await exportGlossyPDF();
 
-        const scaleX =
-            printSize.width/canvas.width;
+            } else {
 
-        const scaleY =
-            printSize.height/canvas.height;
+                await exportPlainPDF();
 
-        ctx.scale(scaleX,scaleY);
+            }
 
-        const image =
-            canvas.toDataURL({
+        } catch (error) {
 
-                format:"png",
+            console.error(
+                "PDF export failed:",
+                error
+            );
 
-                multiplier:1
+            alert("Unable to create the PDF.");
 
-            });
+        } finally {
 
-        const img =
-            new Image();
-
-        img.onload=function(){
-
-            ctx.drawImage(img,0,0);
-
-            createPDF(exportCanvas,paper);
+            exporting = false;
+            button.disabled = false;
+            button.textContent = "Export PDF";
 
         }
 
-        img.src=image;
-
     }
 
-    function createPDF(canvas,paper){
+    async function exportPlainPDF() {
 
-        const {jsPDF}=window.jspdf;
+        const { jsPDF } = window.jspdf;
 
-        const pdf=
-            new jsPDF({
+        const paperKey =
+            document.getElementById("paperSize").value;
 
-                orientation:
+        const printSize =
+            CONFIG.PAPER[paperKey].print;
 
-                    canvas.width>
+        const orientation =
+            printSize.width > printSize.height
+                ? "landscape"
+                : "portrait";
 
-                    canvas.height
+        const pdf = new jsPDF({
+            orientation,
+            unit: "px",
+            format: [
+                printSize.width,
+                printSize.height
+            ],
+            compress: true
+        });
 
-                    ?"landscape"
+        const originalPage =
+            Layout.getCurrentPage();
 
-                    :"portrait",
+        /*
+         * Render page 1 first so Layout calculates
+         * the correct total number of pages.
+         */
+        await Layout.arrange(0);
 
-                unit:"px",
+        const totalPages =
+            Layout.getTotalPages();
 
-                format:[
-                    canvas.width,
-                    canvas.height
-                ]
+        for (
+            let page = 0;
+            page < totalPages;
+            page++
+        ) {
 
-            });
+            if (page > 0) {
 
-        const image=
-            canvas.toDataURL(
-                "image/png",
-                1.0
+                pdf.addPage(
+                    [
+                        printSize.width,
+                        printSize.height
+                    ],
+                    orientation
+                );
+
+            }
+
+            await Layout.arrange(page);
+
+            const pageImage =
+                createPrintImage(
+                    paperKey
+                );
+
+            pdf.addImage(
+                pageImage,
+                "PNG",
+                0,
+                0,
+                printSize.width,
+                printSize.height,
+                undefined,
+                "FAST"
             );
 
-        pdf.addImage(
+        }
 
-            image,
+        pdf.save(createFilename());
 
-            "PNG",
-
-            0,
-
-            0,
-
-            canvas.width,
-
-            canvas.height,
-
-            undefined,
-
-            "FAST"
-
+        /*
+         * Restore the page the user was viewing
+         * before PDF generation.
+         */
+        await Layout.arrange(
+            Math.min(
+                originalPage,
+                totalPages - 1
+            )
         );
-
-        const now =
-            new Date();
-
-        const filename =
-            "PhotoLayout_" +
-
-            now.getFullYear() +
-
-            "-" +
-
-            (now.getMonth()+1) +
-
-            "-" +
-
-            now.getDate() +
-
-            ".pdf";
-
-        pdf.save(filename);
 
     }
 
-    return{
+    async function exportGlossyPDF() {
 
+        const { jsPDF } = window.jspdf;
+
+        const paperKey =
+            document.getElementById("paperSize").value;
+
+        const printSize =
+            CONFIG.PAPER[paperKey].print;
+
+        await Packages.generate();
+
+        const orientation =
+            printSize.width > printSize.height
+                ? "landscape"
+                : "portrait";
+
+        const pdf = new jsPDF({
+            orientation,
+            unit: "px",
+            format: [
+                printSize.width,
+                printSize.height
+            ],
+            compress: true
+        });
+
+        const pageImage =
+            createPrintImage(paperKey);
+
+        pdf.addImage(
+            pageImage,
+            "PNG",
+            0,
+            0,
+            printSize.width,
+            printSize.height,
+            undefined,
+            "FAST"
+        );
+
+        pdf.save(createFilename());
+
+    }
+
+    function createPrintImage(paperKey) {
+
+        const fabricCanvas =
+            Canvas.getCanvas();
+
+        const previewSize =
+            CONFIG.PAPER[paperKey].preview;
+
+        const printSize =
+            CONFIG.PAPER[paperKey].print;
+
+        const multiplier = Math.max(
+            printSize.width /
+                previewSize.width,
+
+            printSize.height /
+                previewSize.height
+        );
+
+        return fabricCanvas.toDataURL({
+            format: "png",
+            quality: 1,
+            multiplier,
+            enableRetinaScaling: false
+        });
+
+    }
+
+    function createFilename() {
+
+        const now = new Date();
+
+        const year =
+            now.getFullYear();
+
+        const month =
+            String(
+                now.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                now.getDate()
+            ).padStart(2, "0");
+
+        return (
+            `PhotoLayout_${year}-${month}-${day}.pdf`
+        );
+
+    }
+
+    return {
         init
-
     };
 
 })();

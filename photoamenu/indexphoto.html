@@ -100,9 +100,9 @@
                         <h2>Glossy Package</h2>
                         <select id="package">
                             <option value="">None</option>
-                            <option>1x1 Package (10 pcs)</option>
-                            <option>2x2 Package (6 pcs)</option>
-                            <option>Mixed Package</option>
+                            <option value="1x1">1x1 Package (10 pcs)</option>
+                            <option value="2x2">2x2 Package (6 pcs)</option>
+                            <option value="mixed">Mixed Package</option>
                         </select>
                     </div>
                     <!--Photo Gap-->
@@ -154,6 +154,13 @@
                     </div>
                     <div id="previewCanvas">
                         <canvas id="photoCanvas"></canvas>
+                    </div>
+                    <div id="pageControls">
+                        <button id="prevPageBtn">Previous</button>
+
+                        <span id="pageInfo">Page 1 of 1</span>
+
+                        <button id="nextPageBtn">Next</button>
                     </div>
                 </div>
             </div>

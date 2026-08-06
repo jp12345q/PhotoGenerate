@@ -224,9 +224,16 @@ button{
 
 /* Paper */
 
-canvas{
-    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+.canvas-container {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.canvas-container .lower-canvas {
     background: white;
+}
+
+.canvas-container .upper-canvas {
+    background: transparent !important;
 }
 
 /* Uploaded Images */
