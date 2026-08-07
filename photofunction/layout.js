@@ -53,10 +53,56 @@ const Layout = (() => {
         Canvas.begin();
 
         const paper = CONFIG.PAPER[paperKey].preview;
-        const photo = CONFIG.PHOTO[photoKey];
 
-        const photoWidth = mmToPx(photo.width);
-        const photoHeight = mmToPx(photo.height);
+        let photoWidth;
+        let photoHeight;
+
+        if (photoKey === "custom") {
+
+            const widthInches =
+                Number(
+                    document.getElementById("customWidth").value
+                );
+
+            const heightInches =
+                Number(
+                    document.getElementById("customHeight").value
+                );
+
+            if (
+                !Number.isFinite(widthInches) ||
+                !Number.isFinite(heightInches) ||
+                widthInches <= 0 ||
+                heightInches <= 0
+            ) {
+                alert("Enter a valid custom width and height.");
+                return;
+            }
+
+            // 1 inch = 96 pixels in the preview canvas
+            photoWidth =
+                widthInches * 96;
+
+            photoHeight =
+                heightInches * 96;
+
+        } else {
+
+            const photo =
+                CONFIG.PHOTO[photoKey];
+
+            if (!photo) {
+                alert("Unknown photo size.");
+                return;
+            }
+
+            photoWidth =
+                mmToPx(photo.width);
+
+            photoHeight =
+                mmToPx(photo.height);
+
+        }
 
         const gap = CONFIG.LAYOUT.gap;
 
