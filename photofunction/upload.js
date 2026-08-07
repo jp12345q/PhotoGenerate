@@ -4,24 +4,61 @@
 
 const Upload = (()=>{
 
+    let selectedIndex = -1;
+
     let imageLibrary=[];
 
     let fileInput;
     let counter;
     let thumbContainer;
 
-    function init(){
-        
-        fileInput = document.getElementById("photoUpload");
-        counter = document.getElementById("imageCount");
-        thumbContainer = document.getElementById("thumbnailContainer");
+    function init() {
+
+        fileInput =
+            document.getElementById("photoUpload");
+
+        counter =
+            document.getElementById("imageCount");
+
+        thumbContainer =
+            document.getElementById(
+                "thumbnailContainer"
+            );
+
+        const deleteButton =
+            document.getElementById(
+                "deletePhotoBtn"
+            );
 
         if (!fileInput) {
-            console.error("photoUpload input not found.");
+            console.error(
+                "photoUpload input not found."
+            );
             return;
         }
 
-        fileInput.addEventListener("change", handleFiles);
+        if (!deleteButton) {
+            console.error(
+                "deletePhotoBtn not found."
+            );
+        } else {
+
+            console.log(
+                "Delete button found:",
+                deleteButton
+            );
+
+            deleteButton.addEventListener(
+                "click",
+                deleteSelected
+            );
+
+        }
+
+        fileInput.addEventListener(
+            "change",
+            handleFiles
+        );
 
     }
 
@@ -38,16 +75,22 @@ const Upload = (()=>{
                     id: Date.now() + Math.random(),
                     name: file.name,
                     src: e.target.result,
+
+                    originalSrc: e.target.result,
+                    transparentSrc: null,
+
                     width: 0,
                     height: 0,
                     cropped: false,
                     backgroundRemoved: false
                 });
-
                 console.log(imageLibrary.length);
 
-                createThumbnail(imageLibrary[imageLibrary.length-1]);
-        
+                createThumbnail(
+                    imageLibrary[imageLibrary.length - 1],
+                    imageLibrary.length - 1
+                );
+
                 updateCounter();
             };
 
@@ -73,31 +116,182 @@ const Upload = (()=>{
 
     }
 
-    function updateCounter(){
+    function updateCounter() {
 
-        counter.innerHTML = imageLibrary.length + " image(s) selected"
+        if (imageLibrary.length === 0) {
+
+            counter.textContent =
+                "No photos selected.";
+
+        } else {
+
+            counter.textContent =
+                `${imageLibrary.length} image(s) selected`;
+
+        }
 
     }
 
-    function createThumbnail(photo){
+    function createThumbnail(
+        photo,
+        index
+    ) {
 
-        const img = document.createElement("img");
+        const img =
+            document.createElement("img");
 
         img.src = photo.src;
         img.className = "thumbnail";
 
-        img.onclick = function () {
-            Canvas.addPhoto(photo.src);
-        };
+        img.addEventListener(
+            "click",
+            () => {
+
+                selectedIndex = index;
+
+                document
+                    .querySelectorAll(
+                        ".thumbnail"
+                    )
+                    .forEach(item => {
+                        item.classList.remove(
+                            "selected"
+                        );
+                    });
+
+                img.classList.add(
+                    "selected"
+                );
+
+                console.log(
+                    "Selected image:",
+                    selectedIndex
+                );
+
+            }
+        );
 
         thumbContainer.appendChild(img);
-
     }
 
     function getImages(){
 
         return imageLibrary;
 
+    }
+
+    function getSelectedImage() {
+        if (selectedIndex < 0) {
+            return null;
+        }
+        
+        return imageLibrary[selectedIndex];
+        
+    }   
+
+    function updateSelectedImage(newSrc) {
+
+        if (selectedIndex < 0) {
+            return false;
+        }
+
+        imageLibrary[selectedIndex].src = newSrc;
+
+        const thumbnails =
+            document.querySelectorAll(".thumbnail");
+
+        if (thumbnails[selectedIndex]) {
+            thumbnails[selectedIndex].src = newSrc;
+        }
+
+        return true;
+    }
+
+    function updateSelectedPhoto(changes) {
+
+        if (
+            selectedIndex < 0 ||
+            !imageLibrary[selectedIndex]
+        ) {
+            return false;
+        }
+
+        Object.assign(
+            imageLibrary[selectedIndex],
+            changes
+        );
+
+        const thumbnails =
+            document.querySelectorAll(".thumbnail");
+
+        if (
+            changes.src &&
+            thumbnails[selectedIndex]
+        ) {
+            thumbnails[selectedIndex].src =
+                changes.src;
+        }
+
+        return true;
+    }
+
+    function deleteSelected() {
+
+        if (
+            selectedIndex < 0 ||
+            !imageLibrary[selectedIndex]
+        ) {
+            alert("Select a photo to delete.");
+            return;
+        }
+
+        const confirmed = confirm(
+            "Delete the selected photo?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        imageLibrary.splice(
+            selectedIndex,
+            1
+        );
+
+        selectedIndex = -1;
+
+        rebuildThumbnails();
+        updateCounter();
+
+        if (imageLibrary.length === 0) {
+
+            Canvas.clearPhotos();
+
+            Canvas.finish();
+
+            // Reset the file input so the same file
+            // can be uploaded again later.
+            fileInput.value = "";
+
+        } else {
+
+            Preview.refresh();
+
+        }
+    }
+
+    function rebuildThumbnails() {
+
+        thumbContainer.innerHTML = "";
+
+        imageLibrary.forEach(
+            (photo, index) => {
+                createThumbnail(
+                    photo,
+                    index
+                );
+            }
+        );
     }
 
     function clear(){
@@ -115,6 +309,16 @@ const Upload = (()=>{
         init,
 
         getImages,
+
+        getSelectedImage,
+
+        updateSelectedImage,
+
+        updateSelectedPhoto,
+
+        deleteSelected,
+
+        rebuildThumbnails,
 
         clear
 
