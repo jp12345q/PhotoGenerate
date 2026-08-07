@@ -13,8 +13,13 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-        <script type="module">import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm";window.removeBackground = removeBackground;</script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+        <!--Remove Background-->
+        <script type="module">import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm";window.removeBackground = removeBackground;</script>
+
+        <!--Background Color Picker-->
+        <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 
         <!--Libraries-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
@@ -61,6 +66,12 @@
                         <div class="thumbnail-wrapper">
                             <div id="thumbnailContainer"></div>
                         </div>
+                        <button
+                            id="deletePhotoBtn"
+                            type="button"
+                        >
+                            Delete Selected Photo
+                        </button>
                     </div>
                     <!--Paper Type Plain and Glossy-->
                     <div class="card">
@@ -93,7 +104,26 @@
                             <option>5R</option>
                             <option>6R</option>
                             <option>8R</option>
+                            <option value="custom">Custom Size</option>
                         </select>
+                        <div id="customSizeGroup" style="display:none;">
+                            <label for="customWidth">Width (inches)</label>
+                            <input
+                                type="number"
+                                id="customWidth"
+                                min="0.1"
+                                step="0.1"
+                                value="2"
+                            >
+                            <label for="customHeight">Height (inches)</label>
+                            <input
+                                type="number"
+                                id="customHeight"
+                                min="0.1"
+                                step="0.1"
+                                value="2"
+                            >
+                        </div>
                     </div>
                     <!--Package Section-->
                     <div class="card" id="packageGroup">
@@ -115,7 +145,7 @@
                                 id="rows"
                                 min="1"
                                 max="20"
-                                value="0">
+                                value="1">
                         </div>
                         <div class="form-group">
                             <label>Columns</label>
@@ -124,7 +154,7 @@
                                 id="columns"
                                 min="1"
                                 max="20"
-                                value="0">
+                                value="1">
                         </div>
                     </div>
                     <!--Photo Remove Background-->
@@ -133,6 +163,41 @@
                         <button id="removeBgBtn">
                             Remove Background
                         </button>
+                        <label for="backgroundColor">
+                            Background Color
+                        </label>
+                        <select id="backgroundColor">
+                            <option value="transparent">
+                                Transparent
+                            </option>
+
+                            <option value="#ffffff">
+                                White
+                            </option>
+
+                            <option value="#ff0000">
+                                Red
+                            </option>
+
+                            <option value="#0066ff">
+                                Blue
+                            </option>
+
+                            <option value="#00aa44">
+                                Green
+                            </option>
+
+                            <option value="#ffdd00">
+                                Yellow
+                            </option>
+                        </select>
+                    </div>
+                    <div class="card">
+
+                        <h2>Background Color</h2>
+
+                        <div id="colorPicker"></div>
+
                     </div>
                     <!--Buttons-->
                     <div class="card">
