@@ -1,0 +1,95 @@
+/*This CSS runs all modal */
+
+/*Modal Remove Background*/
+
+.processing-modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 9999;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.processing-box {
+    width: 280px;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 30px
+        rgba(0, 0, 0, 0.25);
+}
+
+.processing-box h3 {
+    margin-top: 15px;
+}
+
+.processing-box p {
+    margin-top: 8px;
+
+    color: #666;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+
+    margin: auto;
+
+    border: 5px solid #ddd;
+
+    border-top-color: #3498db;
+
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+/*Modal Delete Photo*/
+
+.modal-buttons{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    margin-top:20px;
+
+}
+
+.btn-danger{
+
+    background:#dc3545;
+
+    color:white;
+
+}
+
+.btn-danger:hover{
+
+    background:#b52a37;
+
+}

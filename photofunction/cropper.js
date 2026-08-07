@@ -30,7 +30,7 @@ const CropperTool = (() => {
 
     let cropper = null;
 
-    let selectedObject = null;
+    let selectedPhoto = null;
 
     function init(){
 
@@ -68,13 +68,12 @@ const CropperTool = (() => {
 
         document
         .getElementById("flipXBtn")
-        .onclick=()=>{
-
-            flipX*=-1;
-
-            cropper.scaleX(flipX);
-
-        };
+        .onclick = () => {
+            if (!cropper)
+                return;
+                flipX *= -1;
+                cropper.scaleX(flipX);
+            };
 
         document
         .getElementById("flipYBtn")
@@ -97,108 +96,166 @@ const CropperTool = (() => {
             flipY=1;
 
         };
+        document
+        .getElementById("selectPhotoOkBtn")
+        ?.addEventListener(
+            "click",
+            hideSelectPhotoModal
+        );
 
     }
 
-    function open(){
+    function open() {
 
-        const canvas = Canvas.getCanvas();
         console.log("Cropper.open()");
 
-        selectedObject = canvas.getActiveObject();
+        selectedPhoto =
+            Upload.getSelectedImage();
 
-        if(!selectedObject){
+        if (!selectedPhoto) {
 
-            alert("Select a photo first.");
+            showSelectPhotoModal();
 
             return;
 
         }
 
-        document
-        .getElementById("cropModal")
-        .style.display="flex";
+        const modal =
+            document.getElementById("cropModal");
 
-        const size = document.getElementById("photoSize").value;
-        
-        const img = document.getElementById("cropImage");
+        const img =
+            document.getElementById("cropImage");
 
-        console.log("Selected Object:", selectedObject);
+        const size =
+            document.getElementById("photoSize").value;
 
-        img.src = selectedObject.getSrc();
+        modal.style.display = "flex";
 
-        console.log("Image Source:", img.src);
+        img.src = selectedPhoto.src;
+
+        // Destroy old Cropper instance if necessary
+        if (cropper) {
+
+            cropper.destroy();
+
+            cropper = null;
+
+        }
+
+        let aspectRatio =
+            CropAspect[size] || NaN;
+
+        // Custom plain-paper size
+        if (size === "custom") {
+
+            const width =
+                Number(
+                    document.getElementById(
+                        "customWidth"
+                    ).value
+                );
+
+            const height =
+                Number(
+                    document.getElementById(
+                        "customHeight"
+                    ).value
+                );
+
+            if (width > 0 && height > 0) {
+
+                aspectRatio =
+                    width / height;
+
+            }
+
+        }
 
         cropper = new Cropper(img, {
 
-            aspectRatio: CropAspect[size] || NaN,
+            aspectRatio,
 
-            viewMode:1,
+            viewMode: 1,
 
-            autoCropArea:1,
+            autoCropArea: 1,
 
-            responsive:true,
+            responsive: true,
 
-            movable:true,
+            movable: true,
 
-            zoomable:true,
+            zoomable: true,
 
-            scalable:true,
+            scalable: true,
 
-            rotatable:true,
+            rotatable: true,
 
-            background:false,
+            background: false,
 
-            guides:true,
+            guides: true,
 
-            center:true,
+            center: true,
 
-            highlight:true
-
+            highlight: true
 
         });
 
-
     }
 
-    function apply(){
+    async function apply() {
+
+        if (!cropper || !selectedPhoto) {
+
+            alert("No photo selected.");
+
+            return;
+
+        }
+
+        const croppedCanvas =
+            cropper.getCroppedCanvas({
+
+                imageSmoothingEnabled: true,
+
+                imageSmoothingQuality: "high"
+
+            });
+
+        if (!croppedCanvas) {
+
+            alert("Unable to crop photo.");
+
+            return;
+
+        }
 
         const cropped =
-        cropper
-        .getCroppedCanvas({
+            croppedCanvas.toDataURL(
+                "image/png"
+            );
 
-            imageSmoothingEnabled:true,
+        /*
+        * Save back into imageLibrary.
+        * Preview/PDF will automatically use it.
+        */
+        Upload.updateSelectedPhoto({
 
-            imageSmoothingQuality:"high"
+            src: cropped,
 
-        })
+            originalSrc: cropped,
 
-        .toDataURL("image/png");
-        
-        fabric.Image.fromURL(cropped,function(img){
+            // Previous transparent background no longer
+            // matches this new crop.
+            transparentSrc: null,
 
-            img.left = selectedObject.left;
+            cropped: true,
 
-            img.top = selectedObject.top;
-
-            img.scaleX = selectedObject.scaleX;
-
-            img.scaleY = selectedObject.scaleY;
-
-            const canvas =
-            Canvas.getCanvas();
-
-            canvas.remove(selectedObject);
-
-            canvas.add(img);
-
-            canvas.setActiveObject(img);
-
-            canvas.renderAll();
+            backgroundRemoved: false
 
         });
 
         close();
+
+        await Preview.refresh();
 
     }
 
@@ -215,6 +272,34 @@ const CropperTool = (() => {
         document
         .getElementById("cropModal")
         .style.display="none";
+
+    }
+
+    /*Modal Crop*/
+
+    function showSelectPhotoModal() {
+
+        const modal =
+            document.getElementById(
+                "selectPhotoModal"
+            );
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+
+    }
+
+    function hideSelectPhotoModal() {
+
+        const modal =
+            document.getElementById(
+                "selectPhotoModal"
+            );
+
+        if (modal) {
+            modal.style.display = "none";
+        }
 
     }
 

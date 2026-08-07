@@ -12,6 +12,8 @@ const Upload = (()=>{
     let counter;
     let thumbContainer;
 
+    let deleteCallback = null;
+
     function init() {
 
         fileInput =
@@ -59,6 +61,32 @@ const Upload = (()=>{
             "change",
             handleFiles
         );
+
+        document
+        .getElementById("deleteConfirmBtn")
+        .addEventListener("click",()=>{
+
+            hideDeleteModal();
+
+            if(deleteCallback){
+
+                deleteCallback();
+
+                deleteCallback=null;
+
+            }
+
+        });
+
+        document
+        .getElementById("deleteCancelBtn")
+        .addEventListener("click",()=>{
+
+            deleteCallback=null;
+
+            hideDeleteModal();
+
+        });
 
     }
 
@@ -241,43 +269,51 @@ const Upload = (()=>{
             selectedIndex < 0 ||
             !imageLibrary[selectedIndex]
         ) {
-            alert("Select a photo to delete.");
+
+            const modal =
+                document.getElementById(
+                    "selectPhotoModal"
+                );
+
+            if (modal) {
+                modal.style.display = "flex";
+            }
+
             return;
-        }
-
-        const confirmed = confirm(
-            "Delete the selected photo?"
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
-        imageLibrary.splice(
-            selectedIndex,
-            1
-        );
-
-        selectedIndex = -1;
-
-        rebuildThumbnails();
-        updateCounter();
-
-        if (imageLibrary.length === 0) {
-
-            Canvas.clearPhotos();
-
-            Canvas.finish();
-
-            // Reset the file input so the same file
-            // can be uploaded again later.
-            fileInput.value = "";
-
-        } else {
-
-            Preview.refresh();
 
         }
+
+        // IMPORTANT:
+        // Do NOT splice/delete here.
+
+        showDeleteModal(() => {
+
+            // Delete only AFTER user confirms
+            imageLibrary.splice(
+                selectedIndex,
+                1
+            );
+
+            selectedIndex = -1;
+
+            rebuildThumbnails();
+            updateCounter();
+
+            if (imageLibrary.length === 0) {
+
+                Canvas.clearPhotos();
+                Canvas.finish();
+
+                fileInput.value = "";
+
+            } else {
+
+                Preview.refresh();
+
+            }
+
+        });
+
     }
 
     function rebuildThumbnails() {
@@ -292,6 +328,25 @@ const Upload = (()=>{
                 );
             }
         );
+    }
+
+    function showDeleteModal(callback){
+
+        deleteCallback = callback;
+
+        const modal =
+            document.getElementById("deleteModal");
+
+        modal.style.display = "flex";
+
+    }
+
+    function hideDeleteModal(){
+
+        document
+            .getElementById("deleteModal")
+            .style.display="none";
+
     }
 
     function clear(){

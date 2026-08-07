@@ -56,6 +56,10 @@ const Background = (() => {
 
     async function remove() {
 
+        if (!hasPhotos()) {
+            return;
+        }
+
         if (processing) {
             return;
         }
@@ -64,7 +68,14 @@ const Background = (() => {
             Upload.getSelectedImage();
 
         if (!selectedPhoto) {
-            alert("Select a thumbnail first.");
+            const modal =
+                document.getElementById(
+                    "selectPhotoModal"
+                );
+
+            if (modal) {
+                modal.style.display = "flex";
+            }
             return;
         }
 
@@ -81,9 +92,13 @@ const Background = (() => {
         const button =
             document.getElementById("removeBgBtn");
 
-        processing = true;
-        button.disabled = true;
-        button.textContent = "Removing...";
+            showProcessing(
+                "Removing background..."
+            );
+
+            processing = true;
+            button.disabled = true;
+            button.textContent = "Removing...";
 
         try {
 
@@ -95,6 +110,10 @@ const Background = (() => {
             const result =
                 await window.removeBackground(
                     blob
+                );
+
+                showProcessing(
+                    "Preparing edited photo..."
                 );
 
             const transparentSrc =
@@ -138,6 +157,8 @@ const Background = (() => {
                 button.disabled = false;
                 button.textContent =
                     "Edit Background";
+                
+                hideProcessing();
 
             }
 
@@ -147,7 +168,9 @@ const Background = (() => {
         color,
         showAlert = true
     ) {
-
+        if (!hasPhotos()) {
+            return;
+        }
         const selectedPhoto =
             Upload.getSelectedImage();
 
@@ -322,6 +345,64 @@ const Background = (() => {
         );
 
     }
+    function showProcessing(
+        text = "Removing background..."
+    ) {
+
+        const modal =
+            document.getElementById(
+                "processingModal"
+            );
+
+        const message =
+            document.getElementById(
+                "processingText"
+            );
+
+        if (message) {
+            message.textContent = text;
+        }
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+
+    }
+
+    function hideProcessing() {
+
+        const modal =
+            document.getElementById(
+                "processingModal"
+            );
+
+        if (modal) {
+            modal.style.display = "none";
+        }
+
+    }
+
+    function hasPhotos() {
+
+        const images = Upload.getImages();
+
+        if (!images.length) {
+
+            const modal =
+                document.getElementById(
+                    "noPhotoModal"
+                );
+
+            if (modal) {
+                modal.style.display = "flex";
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
 
     return {
         init

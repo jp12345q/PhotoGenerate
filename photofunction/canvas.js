@@ -191,6 +191,46 @@ const Canvas = (() => {
 
     }
 
+    function addBorder({
+
+        left,
+        top,
+
+        width,
+        height,
+
+        color = "#444",
+
+        thickness = 1
+
+    }) {
+
+        const border = new fabric.Rect({
+
+            left,
+            top,
+
+            width,
+            height,
+
+            fill: "transparent",
+
+            stroke: color,
+
+            strokeWidth: thickness,
+
+            selectable: false,
+
+            evented: false,
+
+            photo: true
+
+        });
+
+        canvas.add(border);
+
+    }
+
     function removeSelected(){
 
         const obj=canvas.getActiveObject();
@@ -267,29 +307,80 @@ const Canvas = (() => {
     }
 
     function fitCanvas() {
-        const wrapper = document.getElementById("previewCanvas");
+
+        const wrapper =
+            document.getElementById("previewCanvas");
 
         if (!wrapper || !canvas || !currentPaper) {
             return;
         }
 
-        const paper = CONFIG.PAPER[currentPaper].preview;
-        const availableWidth = Math.max(wrapper.clientWidth - 40, 1);
-        const scale = Math.min(availableWidth / paper.width, 1);
+        const paper =
+            CONFIG.PAPER[currentPaper].preview;
 
+        /*
+        * Fit paper to available WIDTH.
+        *
+        * Do not fit by height because Legal paper
+        * should simply become taller and the user
+        * can scroll vertically.
+        */
+        const availableWidth =
+            Math.max(
+                wrapper.clientWidth - 20,
+                1
+            );
+
+        const scale =
+            Math.min(
+                availableWidth / paper.width,
+                1
+            );
+
+        const displayWidth =
+            paper.width * scale;
+
+        const displayHeight =
+            paper.height * scale;
+
+        /*
+        * Fabric internal coordinates stay at
+        * the real preview paper size.
+        */
         canvas.setZoom(scale);
 
+        /*
+        * Resize the visible lower/upper canvases.
+        */
         canvas.setDimensions(
             {
-                width: paper.width * scale,
-                height: paper.height * scale
+                width: displayWidth,
+                height: displayHeight
             },
             {
                 cssOnly: true
             }
         );
 
+        /*
+        * VERY IMPORTANT:
+        * Resize Fabric's canvas-container too.
+        */
+        if (canvas.wrapperEl) {
+
+            canvas.wrapperEl.style.width =
+                `${displayWidth}px`;
+
+            canvas.wrapperEl.style.height =
+                `${displayHeight}px`;
+
+            canvas.wrapperEl.style.margin =
+                "0 auto";
+
+        }
+
         canvas.requestRenderAll();
+
     }
 
     function getCanvas(){
@@ -320,7 +411,7 @@ const Canvas = (() => {
         });
     }
 
-    return{
+    return {
 
         init,
 
@@ -333,6 +424,8 @@ const Canvas = (() => {
         refresh,
 
         addPhoto,
+
+        addBorder,
 
         clearCanvas,
 

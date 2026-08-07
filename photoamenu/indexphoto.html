@@ -8,6 +8,9 @@
         <!--Stylesheet-->
         <link rel="stylesheet" href="../photocss/menu.css">
         <link rel="stylesheet" href="../photocss/cropper.css">
+        <link rel="stylesheet" href="../photocss/animation.css">
+        <link rel="stylesheet" href="../photocss/modal.css">
+
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,7 +85,7 @@
                         </select>
                     </div>
                     <!--Paper Size Short or Long bandpaper-->
-                    <div class="card">
+                    <div class="card mode-card" id="paperSizeGroup">
                         <h2>Paper Size</h2>
                         <select id="paperSize">
                             <option value="A4">A4</option>
@@ -91,7 +94,7 @@
                         </select>
                     </div>
                     <!--Edited Photo Size Section-->
-                    <div class="card" id="photoSizeGroup">
+                    <div class="card mode-card" id="photoSizeGroup">
                         <h2>Photo Size</h2>
                         <select id="photoSize">
                             <option>1x1</option>
@@ -126,7 +129,7 @@
                         </div>
                     </div>
                     <!--Package Section-->
-                    <div class="card" id="packageGroup">
+                    <div class="card mode-card" id="packageGroup">
                         <h2>Glossy Package</h2>
                         <select id="package">
                             <option value="">None</option>
@@ -136,7 +139,7 @@
                         </select>
                     </div>
                     <!--Photo Gap-->
-                    <div class="card" id="plainOptions">
+                    <div class="card mode-card" id="plainOptions">
                         <h2>Layout</h2>
                         <div class="form-group">
                             <label>Rows</label>
@@ -258,5 +261,85 @@
             </div>
 
         </div>
+
+        <!--Modal-->
+
+        <!--Loading Removing Background-->
+        <div id="processingModal" class="processing-modal">
+            <div class="processing-box">
+                <div class="spinner"></div>
+                <h3>Processing Photo</h3>
+                <p id="processingText">
+                    Removing background...
+                </p>
+            </div>
+        </div>
+
+        <!--Delete Photo-->
+        <div id="deleteModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>Delete Photo</h3>
+                <p>
+                    Are you sure you want to delete this photo?
+                </p>
+                <div class="modal-buttons">
+                    <button
+                        id="deleteConfirmBtn"
+                        class="btn-danger">
+                        Delete
+                    </button>
+                    <button
+                        id="deleteCancelBtn">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Crop Select alert-->
+        <div id="selectPhotoModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>Select Photo</h3>
+                <p>
+                    Please select a photo from the upload list first.
+                </p>
+                <div class="modal-buttons">
+                    <button id="selectPhotoOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Upload photo first alert-->
+        <div id="noPhotoModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>No Photo Uploaded</h3>
+                <p>
+                    Please upload a photo before changing print settings.
+                </p>
+                <div class="modal-buttons">
+                    <button id="noPhotoOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Export PDF alert-->
+        <div id="noPhotoPdfModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>No Photo to Generate</h3>
+                <p>
+                    Please upload at least one photo before exporting a PDF.
+                </p>
+                <div class="modal-buttons">
+                    <button id="noPhotoPdfOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </body>
 </html>

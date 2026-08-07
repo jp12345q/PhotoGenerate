@@ -49,9 +49,27 @@ const Preview = (() => {
             refresh
         );
 
+        document
+        .getElementById("noPhotoOkBtn")
+        ?.addEventListener(
+            "click",
+            hideNoPhotoModal
+        );
+
     }
 
     function refresh() {
+
+            const images =
+        Upload.getImages();
+
+        if (!images.length) {
+
+            showNoPhotoModal();
+
+            return;
+
+        }
 
         console.log("Preview clicked");
 
@@ -60,18 +78,22 @@ const Preview = (() => {
 
             console.log("Paper:", paperType);
 
+        const packageKey =
+        document.getElementById("package").value;
+
+        if (
+            paperType === "glossy" &&
+            !packageKey
+        ) {
+            return;
+        }
+
         if (paperType === "glossy") {
-
-            console.log("Running Packages.generate()");
             Packages.generate();
-
         } else {
-
-            console.log("Running Layout.arrange()");
-            Layout.resetPage();
-            Layout.arrange();
-            console.log("Layout.arrange()");
-
+            Layout.arrange(
+                Layout.getCurrentPage()
+            );
         }
 
         const canvas = Canvas.getCanvas();
@@ -80,6 +102,32 @@ const Preview = (() => {
         .filter(obj => obj.type === "image");
 
         console.log("Images on canvas:", objects.length);
+
+    }
+
+    function showNoPhotoModal() {
+
+        const modal =
+            document.getElementById(
+                "noPhotoModal"
+            );
+
+        if (modal) {
+            modal.style.display = "flex";
+        }
+
+    }
+
+    function hideNoPhotoModal() {
+
+        const modal =
+            document.getElementById(
+                "noPhotoModal"
+            );
+
+        if (modal) {
+            modal.style.display = "none";
+        }
 
     }
 

@@ -29,21 +29,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function updatePaperMode() {
 
-    const paperType = document.getElementById("paperType").value;
-    const plain = paperType === "plain";
+    const paperType =
+        document.getElementById("paperType").value;
 
-    const photoSizeGroup = document.getElementById("photoSizeGroup");
-    const plainOptions = document.getElementById("plainOptions");
-    const packageGroup = document.getElementById("packageGroup");
+    const paperSizeGroup =
+        document.getElementById("paperSizeGroup");
 
-    if (photoSizeGroup)
-        photoSizeGroup.style.display = plain ? "block" : "none";
+    const photoSizeGroup =
+        document.getElementById("photoSizeGroup");
 
-    if (plainOptions)
-        plainOptions.style.display = plain ? "block" : "none";
+    const plainOptions =
+        document.getElementById("plainOptions");
 
-    if (packageGroup)
-        packageGroup.style.display = plain ? "none" : "block";
+    const packageGroup =
+        document.getElementById("packageGroup");
+
+    const paperSize =
+        document.getElementById("paperSize");
+
+    if (paperType === "plain") {
+
+        hideCard(packageGroup);
+
+        showCard(paperSizeGroup);
+        showCard(photoSizeGroup);
+        showCard(plainOptions);
+
+    } else {
+
+        paperSize.value = "A4";
+
+        hideCard(paperSizeGroup);
+        hideCard(photoSizeGroup);
+        hideCard(plainOptions);
+
+        showCard(packageGroup);
+
+    }
+
+}
+
+function showCard(element) {
+
+    if (!element) {
+        return;
+    }
+
+    element.classList.remove("hide");
+
+    requestAnimationFrame(() => {
+
+        element.classList.remove("hiding");
+
+    });
+
+}
+
+function hideCard(element) {
+
+    if (!element) {
+        return;
+    }
+
+    element.classList.add("hiding");
+
+    element.addEventListener(
+        "transitionend",
+        function handler(event) {
+
+            if (event.propertyName !== "max-height") {
+                return;
+            }
+
+            element.classList.add("hide");
+
+            element.removeEventListener(
+                "transitionend",
+                handler
+            );
+
+        }
+    );
+
 }
 
 function updateCustomSizeVisibility() {

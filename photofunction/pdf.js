@@ -22,6 +22,24 @@ const PDF = (() => {
             exportPDF
         );
 
+        document
+        .getElementById("noPhotoPdfOkBtn")
+        ?.addEventListener(
+            "click",
+            () => {
+
+                const modal =
+                    document.getElementById(
+                        "noPhotoPdfModal"
+                    );
+
+                if (modal) {
+                    modal.style.display = "none";
+                }
+
+            }
+        );
+
     }
 
     async function exportPDF() {
@@ -32,8 +50,17 @@ const PDF = (() => {
 
         const images = Upload.getImages();
 
-        if (!images.length) {
-            alert("Please upload photos first.");
+            if (!images.length) {
+
+            const modal =
+                document.getElementById(
+                    "noPhotoPdfModal"
+                );
+
+            if (modal) {
+                modal.style.display = "flex";
+            }
+
             return;
         }
 

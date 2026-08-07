@@ -38,7 +38,9 @@ const Packages = (() => {
 
         if (!config) {
 
-            alert("Please select a glossy package.");
+            console.log(
+                "Waiting for glossy package selection..."
+            );
 
             return;
 
@@ -145,6 +147,38 @@ const Packages = (() => {
 
         await Promise.all(tasks);
 
+        // Draw cut lines
+        packagePhotos.forEach((photo, index) => {
+
+            const row =
+                Math.floor(index / config.cols);
+
+            const col =
+                index % config.cols;
+
+            const left =
+                startX +
+                col * (photoWidth + config.gap);
+
+            const top =
+                startY +
+                row * (photoHeight + config.gap);
+
+            Canvas.addBorder({
+
+                left,
+                top,
+
+                width: photoWidth,
+                height: photoHeight,
+
+                color: "#555",
+                thickness: 1
+
+            });
+
+        });
+
         Canvas.finish();
 
     }
@@ -250,6 +284,48 @@ const Packages = (() => {
         });
 
         await Promise.all(tasks);
+
+        /* ---------------------------
+        2x2 Borders
+        ---------------------------- */
+
+        topPhotos.forEach((photo, index) => {
+
+            Canvas.addBorder({
+
+                left:
+                    topX +
+                    index * (w2 + gap),
+
+                top: topY,
+
+                width: w2,
+                height: h2
+
+            });
+
+        });
+
+        /* ---------------------------
+        1x1 Borders
+        ---------------------------- */
+
+        bottomPhotos.forEach((photo, index) => {
+
+            Canvas.addBorder({
+
+                left:
+                    bottomX +
+                    index * (w1 + gap),
+
+                top: bottomY,
+
+                width: w1,
+                height: h1
+
+            });
+
+        });
 
         Canvas.finish();
 
