@@ -45,11 +45,6 @@ const Upload = (()=>{
             );
         } else {
 
-            console.log(
-                "Delete button found:",
-                deleteButton
-            );
-
             deleteButton.addEventListener(
                 "click",
                 deleteSelected
