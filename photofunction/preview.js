@@ -35,6 +35,20 @@ const Preview = (() => {
             .getElementById("paperType")
             .addEventListener("change", refresh);
 
+        document
+        .getElementById("customWidth")
+        ?.addEventListener(
+            "input",
+            refresh
+        );
+
+        document
+        .getElementById("customHeight")
+        ?.addEventListener(
+            "input",
+            refresh
+        );
+
     }
 
     function refresh() {
