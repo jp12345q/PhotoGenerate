@@ -146,6 +146,23 @@ button{
     transition:.3s;
 }
 
+/*Button delete */
+#deletePhotoBtn {
+    background: #e74c3c;
+    color: white;
+}
+
+#deletePhotoBtn:hover {
+    background: #c0392b;
+}
+
+.thumbnail.selected {
+    border-color: #e74c3c;
+    box-shadow:
+        0 0 0 3px
+        rgba(231, 76, 60, 0.25);
+}
+
 /* Edit */
 
 #editBtn{
