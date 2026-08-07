@@ -1,17 +1,18 @@
 /* ==========================================
    layout.js
-   Layout Renderer v2
+   Multi-page plain-paper layout
 ========================================== */
 
 const Layout = (() => {
+
+    let currentPage = 0;
+    let totalPages = 1;
 
     function mmToPx(mm) {
         return mm * 3.7795275591;
     }
 
-    async function arrange() {
-
-        const canvas = Canvas.getCanvas();
+    async function arrange(page = currentPage) {
 
         const images = Upload.getImages();
 
@@ -20,12 +21,11 @@ const Layout = (() => {
             return;
         }
 
-        //--------------------------------------------------
-        // Read Settings
-        //--------------------------------------------------
+        const paperKey =
+            document.getElementById("paperSize").value;
 
-        const paperKey = document.getElementById("paperSize").value;
-        const photoKey = document.getElementById("photoSize").value;
+        const photoKey =
+            document.getElementById("photoSize").value;
 
         const rows = Math.max(
             1,
@@ -37,110 +37,169 @@ const Layout = (() => {
             Number(document.getElementById("columns").value)
         );
 
-        //--------------------------------------------------
-        // Load Paper
-        //--------------------------------------------------
+        const photosPerPage = rows * cols;
+
+        totalPages = Math.max(
+            1,
+            Math.ceil(images.length / photosPerPage)
+        );
+
+        currentPage = Math.min(
+            Math.max(page, 0),
+            totalPages - 1
+        );
 
         Canvas.loadPaper(paperKey);
+        Canvas.begin();
 
         const paper = CONFIG.PAPER[paperKey].preview;
-
         const photo = CONFIG.PHOTO[photoKey];
 
         const photoWidth = mmToPx(photo.width);
         const photoHeight = mmToPx(photo.height);
 
-        Canvas.begin();
-
-        //--------------------------------------------------
-        // Margins
-        //--------------------------------------------------
-
-        const margin = CONFIG.LAYOUT.margin;
         const gap = CONFIG.LAYOUT.gap;
 
-        const usableWidth =
-            paper.width - margin * 2;
+        const gridWidth =
+            cols * photoWidth +
+            (cols - 1) * gap;
 
-        const usableHeight =
-            paper.height - margin * 2;
+        const gridHeight =
+            rows * photoHeight +
+            (rows - 1) * gap;
 
-        //--------------------------------------------------
-        // Auto spacing
-        //--------------------------------------------------
+        const startX =
+            (paper.width - gridWidth) / 2;
 
-        const spacingX =
-            cols > 1
-                ? (usableWidth - (cols * photoWidth)) / (cols - 1)
-                : 0;
+        const startY =
+            (paper.height - gridHeight) / 2;
 
-        const spacingY =
-            rows > 1
-                ? (usableHeight - (rows * photoHeight)) / (rows - 1)
-                : 0;
+        const startIndex =
+            currentPage * photosPerPage;
 
-        //--------------------------------------------------
-        // Draw Grid
-        //--------------------------------------------------
+        const pageImages =
+            images.slice(
+                startIndex,
+                startIndex + photosPerPage
+            );
 
-        let index = 0;
+        const photoTasks = pageImages.map((photoData, index) => {
 
-        for (let row = 0; row < rows; row++) {
+            const row = Math.floor(index / cols);
+            const col = index % cols;
 
-            for (let col = 0; col < cols; col++) {
+            const left =
+                startX +
+                col * (photoWidth + gap);
 
-                if (index >= images.length)
-                    break;
+            const top =
+                startY +
+                row * (photoHeight + gap);
 
-                const left =
-                    margin +
-                    col * (photoWidth + spacingX);
+            return Canvas.addPhoto({
+                src: photoData.src,
+                left,
+                top,
+                width: photoWidth,
+                height: photoHeight,
+                fit: "cover"
+            });
 
-                const top =
-                    margin +
-                    row * (photoHeight + spacingY);
+        });
 
-                console.log(
-                    "Drawing Photo",
-                    {
-                        index,
-                        src: images[index].src,
-                        left,
-                        top,
-                        width: photoWidth,
-                        height: photoHeight
-                    }
-                );
+        await Promise.all(photoTasks);
 
-                Canvas.addPhoto({
-
-                    src: images[index].src,
-
-                    left,
-
-                    top,
-
-                    width: photoWidth,
-
-                    height: photoHeight,
-
-                    fit: "cover"
-
-                });
-
-                index++;
-
-            }
-
-        }
-        
         Canvas.finish();
 
+        updatePageControls();
+        
+    }
+
+    function nextPage() {
+
+        if (currentPage < totalPages - 1) {
+            arrange(currentPage + 1);
+        }
+
+    }
+
+    function previousPage() {
+
+        if (currentPage > 0) {
+            arrange(currentPage - 1);
+        }
+
+    }
+
+    function resetPage() {
+
+        currentPage = 0;
+
+    }
+
+    function updatePageControls() {
+
+        const pageInfo =
+            document.getElementById("pageInfo");
+
+        const prevButton =
+            document.getElementById("prevPageBtn");
+
+        const nextButton =
+            document.getElementById("nextPageBtn");
+
+        if (pageInfo) {
+            pageInfo.textContent =
+                `Page ${currentPage + 1} of ${totalPages}`;
+        }
+
+        if (prevButton) {
+            prevButton.disabled =
+                currentPage === 0;
+        }
+
+        if (nextButton) {
+            nextButton.disabled =
+                currentPage >= totalPages - 1;
+        }
+
+    }
+
+    function init() {
+
+        document
+            .getElementById("prevPageBtn")
+            ?.addEventListener(
+                "click",
+                previousPage
+            );
+
+        document
+            .getElementById("nextPageBtn")
+            ?.addEventListener(
+                "click",
+                nextPage
+            );
+
+    }
+
+    function getTotalPages() {
+        return totalPages;
+    }
+
+    function getCurrentPage() {
+        return currentPage;
     }
 
     return {
 
-        arrange
+        init,
+        arrange,
+        nextPage,
+        previousPage,
+        resetPage,
+        getTotalPages,
+        getCurrentPage
 
     };
 

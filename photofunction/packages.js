@@ -44,11 +44,21 @@ const Packages = (() => {
 
         if (packageKey === "mixed") {
 
-            drawMixed(canvas, paper, images[0], config);
+            await drawMixed(
+                canvas,
+                paper,
+                images,
+                config
+            );
 
         } else {
 
-            drawGrid(canvas, paper, images[0], config);
+            await drawGrid(
+                canvas,
+                paper,
+                images[0],
+                config
+            );
 
         }
 
@@ -56,10 +66,9 @@ const Packages = (() => {
 
     //--------------------------------------------------
 
-    function drawGrid(canvas, paper, imageData, config) {
+    async function drawGrid(canvas, paper, imageData, config) {
 
-        const size =
-            CONFIG.PHOTO[config.photo];
+        const size = CONFIG.PHOTO[config.photo];
 
         const photoWidth =
             size.width * 3.779527559;
@@ -79,12 +88,15 @@ const Packages = (() => {
 
         let count = 0;
 
+        const tasks = [];
+
         for (let row = 0; row < config.rows; row++) {
 
             for (let col = 0; col < config.cols; col++) {
 
-                if (count >= config.copies)
-                    return;
+                if (count >= config.copies) {
+                    break;
+                }
 
                 const left =
                     startX +
@@ -94,33 +106,36 @@ const Packages = (() => {
                     startY +
                     row * (photoHeight + config.gap);
 
-                Canvas.addPhoto({
-
-                    src: imageData.src,
-
-                    left,
-
-                    top,
-
-                    width: photoWidth,
-
-                    height: photoHeight,
-
-                    fit: "cover"
-
-                });
+                tasks.push(
+                    Canvas.addPhoto({
+                        src: imageData.src,
+                        left,
+                        top,
+                        width: photoWidth,
+                        height: photoHeight,
+                        fit: "cover"
+                    })
+                );
 
                 count++;
 
             }
 
+            if (count >= config.copies) {
+                break;
+            }
+
         }
+
+        await Promise.all(tasks);
+
+        Canvas.finish();
 
     }
 
     //--------------------------------------------------
 
-    function drawMixed(canvas, paper, images) {
+    async function drawMixed(canvas, paper, images) {
 
         const p2 = CONFIG.PHOTO["2x2"];
         const p1 = CONFIG.PHOTO["1x1"];
@@ -134,65 +149,69 @@ const Packages = (() => {
         const gap = 8;
         const rowGap = 20;
 
-        const topWidth = (w2 * 4) + gap * 3;
-        const bottomWidth = (w1 * 4) + gap * 3;
+        const topWidth =
+            (w2 * 4) + (gap * 3);
 
-        const topX = (paper.width - topWidth) / 2;
-        const bottomX = (paper.width - bottomWidth) / 2;
+        const bottomWidth =
+            (w1 * 4) + (gap * 3);
+
+        const topX =
+            (paper.width - topWidth) / 2;
+
+        const bottomX =
+            (paper.width - bottomWidth) / 2;
 
         const topY = 20;
-        const bottomY = topY + h2 + rowGap;
+        const bottomY =
+            topY + h2 + rowGap;
 
-        // First uploaded photo -> 2x2 row
         const first = images[0];
 
+        const second =
+            images.length > 1
+                ? images[1]
+                : first;
+
+        const tasks = [];
+
+        // Photo #1: four 2x2 copies
         for (let i = 0; i < 4; i++) {
 
-            Canvas.addPhoto({
-
-                src: first.src,
-
-                left: topX + i * (w2 + gap),
-
-                top: topY,
-
-                width: w2,
-
-                height: h2,
-
-                fit: "cover"
-
-            });
+            tasks.push(
+                Canvas.addPhoto({
+                    src: first.src,
+                    left: topX + i * (w2 + gap),
+                    top: topY,
+                    width: w2,
+                    height: h2,
+                    fit: "cover"
+                })
+            );
 
         }
 
-        // Second uploaded photo (if available)
-        const second = images.length > 1
-            ? images[1]
-            : first;
-
+        // Photo #2: four 1x1 copies
         for (let i = 0; i < 4; i++) {
 
-            Canvas.addPhoto({
-
-                src: second.src,
-
-                left: bottomX + i * (w1 + gap),
-
-                top: bottomY,
-
-                width: w1,
-
-                height: h1,
-
-                fit: "cover"
-
-            });
+            tasks.push(
+                Canvas.addPhoto({
+                    src: second.src,
+                    left: bottomX + i * (w1 + gap),
+                    top: bottomY,
+                    width: w1,
+                    height: h1,
+                    fit: "cover"
+                })
+            );
 
         }
+
+        await Promise.all(tasks);
+
+        Canvas.finish();
 
     }
-
+    
     //--------------------------------------------------
 
     return {

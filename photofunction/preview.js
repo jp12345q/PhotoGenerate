@@ -54,6 +54,7 @@ const Preview = (() => {
         } else {
 
             console.log("Running Layout.arrange()");
+            Layout.resetPage();
             Layout.arrange();
             console.log("Layout.arrange()");
 
