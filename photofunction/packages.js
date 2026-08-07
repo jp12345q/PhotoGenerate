@@ -29,14 +29,16 @@ const Packages = (() => {
             CONFIG.PAPER[paperKey].preview;
 
         const packageKey =
-            document.getElementById("photoSize").value;
+        document.getElementById("package").value;
+
+        console.log("Selected glossy package:", packageKey);
 
         const config =
             CONFIG.PACKAGES[packageKey];
 
         if (!config) {
 
-            alert("Unknown package.");
+            alert("Please select a glossy package.");
 
             return;
 
@@ -56,7 +58,7 @@ const Packages = (() => {
             await drawGrid(
                 canvas,
                 paper,
-                images[0],
+                images,
                 config
             );
 
@@ -66,7 +68,7 @@ const Packages = (() => {
 
     //--------------------------------------------------
 
-    async function drawGrid(canvas, paper, imageData, config) {
+    async function drawGrid(canvas, paper, images, config) {
 
         const size = CONFIG.PHOTO[config.photo];
 
@@ -86,46 +88,60 @@ const Packages = (() => {
         const startY =
             config.margin;
 
-        let count = 0;
+        const first = images[0];
+
+        const second =
+            images.length > 1
+                ? images[1]
+                : first;
+
+        const halfCopies =
+            Math.floor(config.copies / 2);
+
+        const packagePhotos = [];
+
+        for (let i = 0; i < halfCopies; i++) {
+            packagePhotos.push(first);
+        }
+
+        for (
+            let i = packagePhotos.length;
+            i < config.copies;
+            i++
+        ) {
+            packagePhotos.push(second);
+        }
 
         const tasks = [];
 
-        for (let row = 0; row < config.rows; row++) {
+        packagePhotos.forEach((photo, index) => {
 
-            for (let col = 0; col < config.cols; col++) {
+            const row =
+                Math.floor(index / config.cols);
 
-                if (count >= config.copies) {
-                    break;
-                }
+            const col =
+                index % config.cols;
 
-                const left =
-                    startX +
-                    col * (photoWidth + config.gap);
+            const left =
+                startX +
+                col * (photoWidth + config.gap);
 
-                const top =
-                    startY +
-                    row * (photoHeight + config.gap);
+            const top =
+                startY +
+                row * (photoHeight + config.gap);
 
-                tasks.push(
-                    Canvas.addPhoto({
-                        src: imageData.src,
-                        left,
-                        top,
-                        width: photoWidth,
-                        height: photoHeight,
-                        fit: "cover"
-                    })
-                );
+            tasks.push(
+                Canvas.addPhoto({
+                    src: photo.src,
+                    left,
+                    top,
+                    width: photoWidth,
+                    height: photoHeight,
+                    fit: "cover"
+                })
+            );
 
-                count++;
-
-            }
-
-            if (count >= config.copies) {
-                break;
-            }
-
-        }
+        });
 
         await Promise.all(tasks);
 
@@ -162,6 +178,7 @@ const Packages = (() => {
             (paper.width - bottomWidth) / 2;
 
         const topY = 20;
+
         const bottomY =
             topY + h2 + rowGap;
 
@@ -174,37 +191,63 @@ const Packages = (() => {
 
         const tasks = [];
 
-        // Photo #1: four 2x2 copies
-        for (let i = 0; i < 4; i++) {
+        const topPhotos = [
+            first,
+            first,
+            second,
+            second
+        ];
+
+        const bottomPhotos = [
+            first,
+            first,
+            second,
+            second
+        ];
+
+        // Four 2x2 copies
+        topPhotos.forEach((photo, index) => {
 
             tasks.push(
                 Canvas.addPhoto({
-                    src: first.src,
-                    left: topX + i * (w2 + gap),
+                    src: photo.src,
+
+                    left:
+                        topX +
+                        index * (w2 + gap),
+
                     top: topY,
+
                     width: w2,
                     height: h2,
+
                     fit: "cover"
                 })
             );
 
-        }
+        });
 
-        // Photo #2: four 1x1 copies
-        for (let i = 0; i < 4; i++) {
+        // Four 1x1 copies
+        bottomPhotos.forEach((photo, index) => {
 
             tasks.push(
                 Canvas.addPhoto({
-                    src: second.src,
-                    left: bottomX + i * (w1 + gap),
+                    src: photo.src,
+
+                    left:
+                        bottomX +
+                        index * (w1 + gap),
+
                     top: bottomY,
+
                     width: w1,
                     height: h1,
+
                     fit: "cover"
                 })
             );
 
-        }
+        });
 
         await Promise.all(tasks);
 
