@@ -15,14 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Upload.init()");
     updatePaperMode();
+    updateCustomSizeVisibility();
 
     document
     .getElementById("paperType")
-    .addEventListener(
-        "change",
+    .addEventListener("change",updatePaperMode);
 
-        updatePaperMode
-    );
+    document
+    .getElementById("photoSize")
+    .addEventListener("change",updateCustomSizeVisibility);
 
 });
 
@@ -43,4 +44,19 @@ function updatePaperMode() {
 
     if (packageGroup)
         packageGroup.style.display = plain ? "none" : "block";
+}
+
+function updateCustomSizeVisibility() {
+
+    const photoSize =
+        document.getElementById("photoSize").value;
+
+    const customGroup =
+        document.getElementById("customSizeGroup");
+
+    customGroup.style.display =
+        photoSize === "custom"
+            ? "block"
+            : "none";
+
 }
