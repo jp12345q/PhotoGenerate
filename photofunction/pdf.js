@@ -252,20 +252,70 @@ const PDF = (() => {
         const printSize =
             CONFIG.PAPER[paperKey].print;
 
-        const multiplier = Math.max(
-            printSize.width /
-                previewSize.width,
+        /*
+        * Save the responsive/mobile zoom.
+        */
+        const originalZoom =
+            fabricCanvas.getZoom();
 
-            printSize.height /
-                previewSize.height
+        const originalViewport =
+            fabricCanvas.viewportTransform
+                ? [...fabricCanvas.viewportTransform]
+                : null;
+
+        /*
+        * IMPORTANT:
+        * PDF must always render at 100% paper scale,
+        * regardless of phone/tablet/desktop preview.
+        */
+        fabricCanvas.setZoom(1);
+
+        fabricCanvas.setViewportTransform([
+            1, 0,
+            0, 1,
+            0, 0
+        ]);
+
+        fabricCanvas.renderAll();
+
+        const multiplier = Math.max(
+            printSize.width / previewSize.width,
+            printSize.height / previewSize.height
         );
 
-        return fabricCanvas.toDataURL({
-            format: "png",
-            quality: 1,
-            multiplier,
-            enableRetinaScaling: false
-        });
+        const image =
+            fabricCanvas.toDataURL({
+
+                format: "png",
+
+                quality: 1,
+
+                multiplier,
+
+                enableRetinaScaling: false
+
+            });
+
+        /*
+        * Restore responsive preview after export.
+        */
+        if (originalViewport) {
+
+            fabricCanvas.setViewportTransform(
+                originalViewport
+            );
+
+        } else {
+
+            fabricCanvas.setZoom(
+                originalZoom
+            );
+
+        }
+
+        fabricCanvas.requestRenderAll();
+
+        return image;
 
     }
 

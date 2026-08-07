@@ -54,6 +54,77 @@ const Background = (() => {
 
     }
 
+    async function resizeForBackgroundRemoval(src, maxSize = 1024) {
+
+        return new Promise((resolve, reject) => {
+
+            const img = new Image();
+
+            img.onload = () => {
+
+                let width = img.naturalWidth;
+                let height = img.naturalHeight;
+
+                const scale = Math.min(
+                    1,
+                    maxSize / Math.max(width, height)
+                );
+
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+
+                const tempCanvas =
+                    document.createElement("canvas");
+
+                tempCanvas.width = width;
+                tempCanvas.height = height;
+
+                const ctx =
+                    tempCanvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0,
+                    width,
+                    height
+                );
+
+                tempCanvas.toBlob(
+                    blob => {
+
+                        if (!blob) {
+                            reject(
+                                new Error(
+                                    "Unable to resize photo."
+                                )
+                            );
+                            return;
+                        }
+
+                        resolve(blob);
+
+                    },
+                    "image/jpeg",
+                    0.9
+                );
+
+            };
+
+            img.onerror = () => {
+                reject(
+                    new Error(
+                        "Unable to load photo for resizing."
+                    )
+                );
+            };
+
+            img.src = src;
+
+        });
+
+    }
+
     async function remove() {
 
         if (!hasPhotos()) {
@@ -102,22 +173,36 @@ const Background = (() => {
 
         try {
 
+            showProcessing(
+                "Preparing photo..."
+            );
+
             const blob =
-                await dataUrlToBlob(
-                    selectedPhoto.src
+                await resizeForBackgroundRemoval(
+                    selectedPhoto.src,
+                    1024
                 );
 
-            const result =
-                await window.removeBackground(
-                    blob
-                );
+            showProcessing(
+                "Removing background..."
+            );
+
+            const slowMessage =
+            setTimeout(() => {
 
                 showProcessing(
-                    "Preparing edited photo..."
+                    "Still processing... this device may take a little longer."
                 );
 
-            const transparentSrc =
-                await blobToDataURL(result);
+            }, 8000);
+
+            const result = await window.removeBackground(blob);
+
+            clearTimeout(slowMessage);
+
+            showProcessing("Preparing edited photo...");
+
+            const transparentSrc = await blobToDataURL(result);
 
             Upload.updateSelectedPhoto({
                 src: transparentSrc,
@@ -137,8 +222,6 @@ const Background = (() => {
             } else {
                 await Preview.refresh();
             }
-
-            await Preview.refresh();
 
             } catch (error) {
 
@@ -213,17 +296,99 @@ const Background = (() => {
 
         try {
 
-            const coloredSrc =
-                await addBackgroundColor(
-                    transparentSrc,
-                    color
+            showProcessing(
+                "Preparing photo..."
+            );
+
+            const isMobile =
+                /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
                 );
 
+            const lowMemory =
+                navigator.deviceMemory &&
+                navigator.deviceMemory <= 4;
+
+            const lowCpu =
+                navigator.hardwareConcurrency &&
+                navigator.hardwareConcurrency <= 4;
+
+            let maxSize = 1280;
+
+            if (isMobile) {
+                maxSize = 896;
+            }
+
+            if (lowMemory || lowCpu) {
+                maxSize = 768;
+            }
+
+            console.log(
+                "Background removal max size:",
+                maxSize
+            );
+
+            const blob =
+                await resizeForBackgroundRemoval(
+                    selectedPhoto.src,
+                    maxSize
+                );
+
+            showProcessing(
+                "Removing background..."
+            );
+
+            const slowMessage =
+                setTimeout(() => {
+
+                    showProcessing(
+                        "Still processing... this device may take a little longer."
+                    );
+
+                }, 8000);
+
+            const result =
+                await window.removeBackground(
+                    blob
+                );
+
+            clearTimeout(slowMessage);
+
+            showProcessing(
+                "Preparing edited photo..."
+            );
+
+            const transparentSrc =
+                await blobToDataURL(result);
+
             Upload.updateSelectedPhoto({
-                src: coloredSrc
+                src: transparentSrc,
+                transparentSrc,
+                backgroundRemoved: true
             });
 
-            await Preview.refresh();
+            const selectedColor =
+                document
+                    .getElementById(
+                        "backgroundColor"
+                    )
+                    ?.value || "transparent";
+
+            if (
+                selectedColor !==
+                "transparent"
+            ) {
+
+                await applyColor(
+                    selectedColor,
+                    false
+                );
+
+            } else {
+
+                await Preview.refresh();
+
+            }
 
         } catch (error) {
 
