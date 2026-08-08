@@ -19,6 +19,24 @@ cropper.css
 
     z-index:9999;
 
+    padding:12px;
+
+}
+
+.crop-image-area{
+
+    flex:1;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    overflow:hidden;
+
+    min-height:0;
+
 }
 
 .crop-box{
@@ -29,26 +47,156 @@ cropper.css
 
     border-radius:10px;
 
-    width:80%;
+    width:min(92vw,900px);
 
-    max-width:900px;
+    max-height:92vh;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
 
 }
+
+
+/* Crop Image */
 
 .crop-box img{
 
-    max-width:100%;
-
     display:block;
 
+    max-width:100%;
+
+    max-height:100%;
+
+    width:auto;
+
+    height:auto;
+
 }
+
+
+/* Toolbar */
 
 .crop-toolbar{
 
     display:flex;
 
+    flex-wrap:wrap;
+
     gap:10px;
 
     margin-top:15px;
+
+    justify-content:center;
+
+}
+
+.crop-toolbar button{
+
+    width:auto;
+
+    min-width:70px;
+
+    flex:1 1 80px;
+
+    margin-top:0;
+
+}
+
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media(max-width:600px){
+
+    .crop-modal{
+
+        align-items:center;
+
+        padding:8px;
+
+    }
+
+    .crop-box{
+
+        width:96vw;
+
+        max-height:94vh;
+
+        padding:12px;
+
+        border-radius:10px;
+
+    }
+
+    .crop-box img{
+
+        max-height:56vh;
+
+    }
+
+    .crop-toolbar{
+
+        gap:7px;
+
+        margin-top:10px;
+
+    }
+
+    .crop-toolbar button{
+
+        min-width:60px;
+
+        flex:1 1 65px;
+
+        padding:10px 6px;
+
+        font-size:13px;
+
+    }
+
+}
+
+
+/* ==========================================
+   Very Small Phones
+========================================== */
+
+@media(max-width:400px){
+
+    .crop-box{
+
+        width:98vw;
+
+        padding:8px;
+
+    }
+
+    .crop-box img{
+
+        max-height:52vh;
+
+    }
+
+    .crop-toolbar{
+
+        gap:5px;
+
+    }
+
+    .crop-toolbar button{
+
+        min-width:55px;
+
+        flex:1 1 58px;
+
+        padding:9px 4px;
+
+        font-size:12px;
+
+    }
 
 }
