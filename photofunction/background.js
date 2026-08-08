@@ -177,10 +177,38 @@ const Background = (() => {
                 "Preparing photo..."
             );
 
+            const isMobile =
+                /Android|iPhone|iPad|iPod/i.test(
+                    navigator.userAgent
+                );
+
+            const lowMemory =
+                navigator.deviceMemory &&
+                navigator.deviceMemory <= 4;
+
+            const lowCpu =
+                navigator.hardwareConcurrency &&
+                navigator.hardwareConcurrency <= 4;
+
+            let maxSize = 1280;
+
+            if (isMobile) {
+                maxSize = 896;
+            }
+
+            if (lowMemory || lowCpu) {
+                maxSize = 768;
+            }
+
+            console.log(
+                "Background removal max size:",
+                maxSize
+            );
+
             const blob =
                 await resizeForBackgroundRemoval(
                     selectedPhoto.src,
-                    1024
+                    maxSize
                 );
 
             showProcessing(
@@ -243,7 +271,7 @@ const Background = (() => {
                 
                 hideProcessing();
 
-            }
+        }
 
     }
 
@@ -251,39 +279,60 @@ const Background = (() => {
         color,
         showAlert = true
     ) {
+
         if (!hasPhotos()) {
             return;
         }
+
         const selectedPhoto =
             Upload.getSelectedImage();
 
         if (!selectedPhoto) {
 
             if (showAlert) {
-                alert("Select a thumbnail first.");
+
+                const modal =
+                    document.getElementById(
+                        "selectPhotoModal"
+                    );
+
+                if (modal) {
+                    modal.style.display = "flex";
+                }
+
+            }
+
+            return;
+        }
+
+        const transparentSrc =
+            selectedPhoto.transparentSrc;
+
+        /*
+        * Background removal must be done once
+        * before colors can be changed.
+        */
+        if (!transparentSrc) {
+
+            if (showAlert) {
+
+                const modal =
+                    document.getElementById(
+                        "selectPhotoModal"
+                    );
+
+                if (modal) {
+                    modal.style.display = "flex";
+                }
+
             }
 
             return;
         }
 
         /*
-        * Every photo now owns its own
-        * transparent source.
+        * Transparent option
         */
-        const transparentSrc =
-            selectedPhoto.transparentSrc;
-
-        if (!transparentSrc) {
-
-            if (showAlert) {
-                alert(
-                    "Click Edit Background for this photo first."
-                );
-            }
-
-            return;
-        }
-
         if (color === "transparent") {
 
             Upload.updateSelectedPhoto({
@@ -291,114 +340,35 @@ const Background = (() => {
             });
 
             await Preview.refresh();
+
             return;
         }
 
         try {
 
-            showProcessing(
-                "Preparing photo..."
-            );
-
-            const isMobile =
-                /Android|iPhone|iPad|iPod/i.test(
-                    navigator.userAgent
+            /*
+            * NO AI HERE.
+            *
+            * Just put the chosen color behind
+            * the already-transparent PNG.
+            */
+            const coloredSrc =
+                await addBackgroundColor(
+                    transparentSrc,
+                    color
                 );
-
-            const lowMemory =
-                navigator.deviceMemory &&
-                navigator.deviceMemory <= 4;
-
-            const lowCpu =
-                navigator.hardwareConcurrency &&
-                navigator.hardwareConcurrency <= 4;
-
-            let maxSize = 1280;
-
-            if (isMobile) {
-                maxSize = 896;
-            }
-
-            if (lowMemory || lowCpu) {
-                maxSize = 768;
-            }
-
-            console.log(
-                "Background removal max size:",
-                maxSize
-            );
-
-            const blob =
-                await resizeForBackgroundRemoval(
-                    selectedPhoto.src,
-                    maxSize
-                );
-
-            showProcessing(
-                "Removing background..."
-            );
-
-            const slowMessage =
-                setTimeout(() => {
-
-                    showProcessing(
-                        "Still processing... this device may take a little longer."
-                    );
-
-                }, 8000);
-
-            const result =
-                await window.removeBackground(
-                    blob
-                );
-
-            clearTimeout(slowMessage);
-
-            showProcessing(
-                "Preparing edited photo..."
-            );
-
-            const transparentSrc =
-                await blobToDataURL(result);
 
             Upload.updateSelectedPhoto({
-                src: transparentSrc,
-                transparentSrc,
-                backgroundRemoved: true
+                src: coloredSrc
             });
 
-            const selectedColor =
-                document
-                    .getElementById(
-                        "backgroundColor"
-                    )
-                    ?.value || "transparent";
-
-            if (
-                selectedColor !==
-                "transparent"
-            ) {
-
-                await applyColor(
-                    selectedColor,
-                    false
-                );
-
-            } else {
-
-                await Preview.refresh();
-
-            }
+            await Preview.refresh();
 
         } catch (error) {
 
             console.error(
                 "Unable to apply background color:",
                 error
-            );
-
-            alert(
-                "Unable to apply background color."
             );
 
         }
