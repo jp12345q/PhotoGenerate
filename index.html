@@ -5,19 +5,32 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Photo Generate</title>
 
-        <!--Stylesheet-->
-        <link rel="stylesheet" href="./photocss/menu.css">
-        <link rel="stylesheet" href="./photocss/animation.css">
-        <link rel="stylesheet" href="./photocss/cropper.css">
-        <link rel="stylesheet" href="./photocss/modal.css">
-
-        <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📸</text></svg>'>
-        <link rel="icon" href="photoamenu/favicon.ico">
+        <!-- Google Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        >
+
+        <!-- CropperJS library CSS FIRST -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css"
+        >
+
+        <!-- Your CSS AFTER libraries -->
+        <link rel="stylesheet" href="./photocss/menu.css">
+        <link rel="stylesheet" href="./photocss/animation.css">
+        <link rel="stylesheet" href="./photocss/cropper.css?v=2">
+        <link rel="stylesheet" href="./photocss/modal.css">
+
+        <!-- Favicon -->
+        <link
+            rel="icon"
+            href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📸</text></svg>'
+        >
 
         <!--Remove Background-->
         <script type="module">import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm";window.removeBackground = removeBackground;</script>
@@ -26,8 +39,14 @@
         <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 
         <!--Libraries-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 
+        <!-- Fabric.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+        <!-- jsPDF -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+        <!-- CropperJS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 
 
