@@ -1,14 +1,346 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta
-        http-equiv="refresh"
-        content="0; url=photoamenu/indexphoto.html"
-    >
-    <title>Photo Generate</title>
-</head>
-<body>
-    Redirecting...
-</body>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Photo Generate</title>
+
+        <!--Stylesheet-->
+        <link rel="stylesheet" href="./photocss/menu.css">
+        <link rel="stylesheet" href="./photocss/animation.css">
+        <link rel="stylesheet" href="./photocss/menu.css">
+        <link rel="stylesheet" href="./photocss/modal.css">
+
+        <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📸</text></svg>'>
+        <link rel="icon" href="photoamenu/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+        <!--Remove Background-->
+        <script type="module">import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm";window.removeBackground = removeBackground;</script>
+
+        <!--Background Color Picker-->
+        <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+        <!--Libraries-->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
+
+        <!--Core-->
+        <script src="./photofunction/config.js"></script>
+        <script src="./photofunction/canvas.js"></script>
+        <script src="./photofunction/upload.js"></script>
+        <script src="./photofunction/layout.js"></script>
+        <script src="./photofunction/packages.js"></script>
+
+        <!--Editors-->
+        <script src="./photofunction/background.js"></script>
+        <script src="./photofunction/cropper.js"></script>
+
+        <!--Features-->
+        <script src="./photojv/guides.js"></script>
+        <script src="./photofunction/preview.js"></script>
+        <script src="./photofunction/pdf.js"></script>
+
+        <!--Main-->
+        <script src="./photojv/app.js"></script>
+
+
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Photo Printing Generate</h1>
+                <p>Create professional ID and Photo Printing Layouts</p>
+            </header>
+            <div class="main">
+                <div class="sidebar">
+                    <!--Upload Image jpg, jpeg and png -->
+                    <div class="card">
+                        <h2>Upload Photos</h2>
+                        <input type="file" id="photoUpload" multiple accept=".jpg,.jpeg,.png">
+                        <div id="imageCount">
+                            No photos selected.
+                        </div>
+                        <div class="thumbnail-wrapper">
+                            <div id="thumbnailContainer"></div>
+                        </div>
+                        <button
+                            id="deletePhotoBtn"
+                            type="button"
+                        >
+                            Delete Selected Photo
+                        </button>
+                    </div>
+                    <!--Paper Type Plain and Glossy-->
+                    <div class="card">
+                        <h2>Paper Type</h2>
+                        <select id="paperType">
+                            <option value="plain">Plain Paper</option>
+                            <option value="glossy">Glossy Paper</option>
+                        </select>
+                    </div>
+                    <!--Paper Size Short or Long bandpaper-->
+                    <div class="card mode-card" id="paperSizeGroup">
+                        <h2>Paper Size</h2>
+                        <select id="paperSize">
+                            <option value="A4">A4</option>
+                            <option value="LETTER">Letter</option>
+                            <option value="LEGAL">Legal</option>
+                        </select>
+                    </div>
+                    <!--Edited Photo Size Section-->
+                    <div class="card mode-card" id="photoSizeGroup">
+                        <h2>Photo Size</h2>
+                        <select id="photoSize">
+                            <option>1x1</option>
+                            <option>2x2</option>
+                            <option>Passport</option>
+                            <option>ID</option>
+                            <option>Wallet</option>
+                            <option>3R</option>
+                            <option>4R</option>
+                            <option>5R</option>
+                            <option>6R</option>
+                            <option>8R</option>
+                            <option value="custom">Custom Size</option>
+                        </select>
+                        <div id="customSizeGroup" style="display:none;">
+                            <label for="customWidth">Width (inches)</label>
+                            <input
+                                type="number"
+                                id="customWidth"
+                                min="0.1"
+                                step="0.1"
+                                value="2"
+                            >
+                            <label for="customHeight">Height (inches)</label>
+                            <input
+                                type="number"
+                                id="customHeight"
+                                min="0.1"
+                                step="0.1"
+                                value="2"
+                            >
+                        </div>
+                    </div>
+                    <!--Package Section-->
+                    <div class="card mode-card" id="packageGroup">
+                        <h2>Glossy Package</h2>
+                        <select id="package">
+                            <option value="">None</option>
+                            <option value="1x1">1x1 Package (10 pcs)</option>
+                            <option value="2x2">2x2 Package (6 pcs)</option>
+                            <option value="mixed">Mixed Package</option>
+                        </select>
+                    </div>
+                    <!--Photo Gap-->
+                    <div class="card mode-card" id="plainOptions">
+                        <h2>Layout</h2>
+                        <div class="form-group">
+                            <label>Rows</label>
+                            <input
+                                type="number"
+                                id="rows"
+                                min="1"
+                                max="20"
+                                value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Columns</label>
+                            <input
+                                type="number"
+                                id="columns"
+                                min="1"
+                                max="20"
+                                value="1">
+                        </div>
+                    </div>
+                    <!--Photo Remove Background-->
+                    <div class="card">
+                        <h2>Background</h2>
+                        <button id="removeBgBtn">
+                            Remove Background
+                        </button>
+                        <label for="backgroundColor">
+                            Background Color
+                        </label>
+                        <select id="backgroundColor">
+                            <option value="transparent">
+                                Transparent
+                            </option>
+
+                            <option value="#ffffff">
+                                White
+                            </option>
+
+                            <option value="#ff0000">
+                                Red
+                            </option>
+
+                            <option value="#0066ff">
+                                Blue
+                            </option>
+
+                            <option value="#00aa44">
+                                Green
+                            </option>
+
+                            <option value="#ffdd00">
+                                Yellow
+                            </option>
+                        </select>
+                    </div>
+                    <div class="card">
+
+                        <h2>Background Color</h2>
+
+                        <div id="colorPicker"></div>
+
+                    </div>
+                    <!--Buttons-->
+                    <div class="card">
+                        <button id="editBtn">
+                            Edit Photos
+                        </button>
+                        <button id="previewBtn">
+                            Preview Layout
+                        </button>
+                        <button id="pdfBtn">
+                            Export PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="preview">
+                    <!--View photo-->
+                    <div class="previewHeader">
+                        <h2>Preview</h2>
+                    </div>
+                    <div id="previewCanvas">
+                        <canvas id="photoCanvas"></canvas>
+                    </div>
+                    <div id="pageControls">
+                        <button id="prevPageBtn">Previous</button>
+
+                        <span id="pageInfo">Page 1 of 1</span>
+
+                        <button id="nextPageBtn">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Crop Photo-->
+        <div id="cropModal" class="crop-modal">
+
+            <div class="crop-box">
+                <div class="crop-image-area">
+                    <img id="cropImage">
+                </div>
+                <div class="crop-toolbar">
+
+                    <button id="zoomOutBtn">－</button>
+                    <button id="zoomInBtn">＋</button>
+
+                    <button id="rotateLeftBtn">⟲</button>
+                    <button id="rotateRightBtn">⟳</button>
+
+                    <button id="flipXBtn">Flip H</button>
+                    <button id="flipYBtn">Flip V</button>
+
+                    <button id="resetCropBtn">Reset</button>
+
+                    <button id="cropApply">Apply</button>
+                    <button id="cropCancel">Cancel</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--Modal-->
+
+        <!--Loading Removing Background-->
+        <div id="processingModal" class="processing-modal">
+            <div class="processing-box">
+                <div class="spinner"></div>
+                <h3>Processing Photo</h3>
+                <p id="processingText">
+                    Removing background...
+                </p>
+            </div>
+        </div>
+
+        <!--Delete Photo-->
+        <div id="deleteModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>Delete Photo</h3>
+                <p>
+                    Are you sure you want to delete this photo?
+                </p>
+                <div class="modal-buttons">
+                    <button
+                        id="deleteConfirmBtn"
+                        class="btn-danger">
+                        Delete
+                    </button>
+                    <button
+                        id="deleteCancelBtn">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Crop Select alert-->
+        <div id="selectPhotoModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>Select Photo</h3>
+                <p>
+                    Please select a photo from the upload list first.
+                </p>
+                <div class="modal-buttons">
+                    <button id="selectPhotoOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Upload photo first alert-->
+        <div id="noPhotoModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>No Photo Uploaded</h3>
+                <p>
+                    Please upload a photo before changing print settings.
+                </p>
+                <div class="modal-buttons">
+                    <button id="noPhotoOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--Export PDF alert-->
+        <div id="noPhotoPdfModal" class="processing-modal">
+            <div class="processing-box">
+                <h3>No Photo to Generate</h3>
+                <p>
+                    Please upload at least one photo before exporting a PDF.
+                </p>
+                <div class="modal-buttons">
+                    <button id="noPhotoPdfOkBtn">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </body>
 </html>
