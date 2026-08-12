@@ -67,6 +67,7 @@
         <script src="./photofunction/pdf.js"></script>
 
         <!--Main-->
+        <script src="./photofunction/package-settings.js"></script>
         <script src="./photojv/app.js"></script>
 
 
@@ -150,7 +151,18 @@
                     </div>
                     <!--Package Section-->
                     <div class="card mode-card" id="packageGroup">
-                        <h2>Glossy Package</h2>
+                        <div class="package-card-header">
+                            <h2>Glossy Package</h2>
+                            <button
+                            id="settingsBtn"
+                            type="button"
+                            class="package-settings-btn"
+                            title="Package Settings"
+                            >
+                            ⚙
+                            </button>
+                        </div>
+
                         <select id="package">
                             <option value="">None</option>
                             <option value="1x1">1x1 Package (10 pcs)</option>
@@ -283,6 +295,47 @@
         </div>
 
         <!--Modal-->
+
+        <!--Package Customize-->
+        <div
+            id="packageSettingsModal"
+            class="processing-modal"
+        >
+            <div class="package-settings-box">
+                <h2>
+                    Glossy Package Settings
+                </h2>
+                <label for="customPackageName">
+                    Package Name
+                </label>
+                <input
+                    type="text"
+                    id="customPackageName"
+                    placeholder="Example: ID Package A"
+                >
+                <div id="packageRows"></div>
+                <button
+                    id="addPackageRowBtn"
+                    type="button"
+                >
+                    + Add Photo Size
+                </button>
+                <div class="modal-buttons">
+                    <button id="savePackageBtn">
+                        Save Package
+                    </button>
+                    <button
+                        id="deletePackageBtn"
+                        class="btn-danger"
+                    >
+                        Delete Package
+                    </button>
+                    <button id="closePackageSettingsBtn">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!--Loading Removing Background-->
         <div id="processingModal" class="processing-modal">
