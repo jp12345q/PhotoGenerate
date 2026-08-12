@@ -93,3 +93,132 @@
     background:#b52a37;
 
 }
+
+/*Card for Setting Package */
+
+.package-settings-box{
+
+    width:min(92vw,560px);
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    background:#fff;
+
+    padding:28px;
+
+    border-radius:16px;
+
+    box-shadow:
+        0 18px 50px
+        rgba(0,0,0,.28);
+
+}
+
+.package-settings-box h2{
+
+    margin:0 0 20px;
+
+    color:#0f4c81;
+
+}
+
+.package-settings-box label{
+
+    margin-bottom:6px;
+
+    font-weight:500;
+
+}
+
+.package-settings-box input,
+.package-settings-box select{
+
+    width:100%;
+
+    padding:11px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:15px;
+
+}
+
+.package-builder-row{
+
+    display:grid;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        90px
+        42px;
+
+    gap:8px;
+
+    align-items:center;
+
+    margin-top:10px;
+
+}
+
+.package-builder-row .remove-package-row{
+
+    width:42px;
+
+    height:42px;
+
+    margin:0;
+
+    padding:0;
+
+    background:#f1f1f1;
+
+    color:#333;
+
+}
+
+.package-builder-row .remove-package-row:hover{
+
+    background:#e74c3c;
+
+    color:#fff;
+
+}
+
+@media(max-width:600px){
+
+    .package-settings-box{
+
+        width:95vw;
+
+        padding:18px;
+
+    }
+
+    .package-builder-row{
+
+        grid-template-columns:
+            minmax(0,1fr)
+            70px
+            40px;
+
+    }
+
+    .modal-buttons{
+
+        flex-direction:column;
+
+    }
+
+    .modal-buttons button{
+
+        width:100%;
+
+    }
+
+}
+
+/*Card Setting Package end here*/
