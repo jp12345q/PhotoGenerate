@@ -36,16 +36,43 @@ const Packages = (() => {
         const config =
             CONFIG.PACKAGES[packageKey];
 
-        if (!config) {
+        const customPackage =
+            PackageSettings.getPackage(
+                packageKey
+            );
+
+        /*
+        * Nothing selected
+        */
+        if (!config && !customPackage) {
 
             console.log(
                 "Waiting for glossy package selection..."
             );
 
             return;
-
         }
 
+
+        /*
+        * CUSTOM GLOSSY PACKAGE
+        */
+        if (customPackage) {
+
+            await drawCustomPackage(
+                canvas,
+                paper,
+                images,
+                customPackage
+            );
+
+            return;
+        }
+
+
+        /*
+        * BUILT-IN PACKAGES
+        */
         if (packageKey === "mixed") {
 
             await drawMixed(
@@ -326,6 +353,200 @@ const Packages = (() => {
             });
 
         });
+
+        Canvas.finish();
+
+    }
+
+    async function drawCustomPackage(
+        canvas,
+        paper,
+        images,
+        customPackage
+    ) {
+
+        if (
+            !customPackage ||
+            !customPackage.items ||
+            !customPackage.items.length
+        ) {
+
+            console.error(
+                "Custom package has no items."
+            );
+
+            return;
+        }
+
+        const GAP = 8;
+
+        const MARGIN = 20;
+
+        let currentX = MARGIN;
+        let currentY = MARGIN;
+
+        let rowHeight = 0;
+
+        let imageIndex = 0;
+
+
+        /*
+        * Example:
+        *
+        * items = [
+        *   { size:"2x2", copies:4 },
+        *   { size:"Wallet", copies:2 }
+        * ]
+        */
+
+        for (
+            const item of customPackage.items
+        ) {
+
+            const photoConfig =
+                CONFIG.PHOTO[item.size];
+
+            if (!photoConfig) {
+
+                console.warn(
+                    "Unknown photo size:",
+                    item.size
+                );
+
+                continue;
+            }
+
+
+            const photoWidth =
+                photoConfig.width *
+                3.779527559;
+
+            const photoHeight =
+                photoConfig.height *
+                3.779527559;
+
+
+            for (
+                let copy = 0;
+                copy < item.copies;
+                copy++
+            ) {
+
+                /*
+                * If the next photo no longer
+                * fits horizontally, start a
+                * new row.
+                */
+                if (
+                    currentX +
+                    photoWidth >
+                    paper.width - MARGIN
+                ) {
+
+                    currentX = MARGIN;
+
+                    currentY +=
+                        rowHeight + GAP;
+
+                    rowHeight = 0;
+
+                }
+
+
+                /*
+                * Stop if we've reached the
+                * bottom of the A4 paper.
+                */
+                if (
+                    currentY +
+                    photoHeight >
+                    paper.height - MARGIN
+                ) {
+
+                    console.warn(
+                        "Custom package does not fit on the page."
+                    );
+
+                    Canvas.finish();
+
+                    return;
+
+                }
+
+
+                /*
+                * Cycle through uploaded photos.
+                *
+                * 1 photo:
+                * photo1 photo1 photo1...
+                *
+                * 2 photos:
+                * photo1 photo2 photo1 photo2...
+                */
+                const photo =
+                    images[
+                        imageIndex %
+                        images.length
+                    ];
+
+
+                await Canvas.addPhoto({
+
+                    src: photo.src,
+
+                    left: currentX,
+
+                    top: currentY,
+
+                    width: photoWidth,
+
+                    height: photoHeight,
+
+                    fit: "cover"
+
+                });
+
+
+                /*
+                * Glossy cutting line
+                */
+                Canvas.addBorder({
+
+                    left: currentX,
+
+                    top: currentY,
+
+                    width: photoWidth,
+
+                    height: photoHeight,
+
+                    color: "#555",
+
+                    thickness: 1
+
+                });
+
+
+                /*
+                * Keep tallest photo in this row
+                */
+                rowHeight =
+                    Math.max(
+                        rowHeight,
+                        photoHeight
+                    );
+
+
+                currentX +=
+                    photoWidth + GAP;
+
+
+                imageIndex++;
+
+            }
+
+        }
+
 
         Canvas.finish();
 
