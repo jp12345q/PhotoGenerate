@@ -97,7 +97,8 @@ const Canvas = (() => {
         top,
         width,
         height,
-        fit = "cover"
+        fit = "cover",
+        rotation = 0
     }) {
 
         return new Promise((resolve, reject) => {
@@ -115,47 +116,57 @@ const Canvas = (() => {
 
                     let scale;
 
+                    /*
+                    * When rotated 90° / 270°,
+                    * width and height are reversed.
+                    */
+                    const rotated =
+                        Math.abs(rotation % 180) === 90;
+
+                    const sourceWidth =
+                        rotated
+                            ? img.height
+                            : img.width;
+
+                    const sourceHeight =
+                        rotated
+                            ? img.width
+                            : img.height;
+
+
                     if (fit === "contain") {
 
                         scale = Math.min(
-                            width / img.width,
-                            height / img.height
+                            width / sourceWidth,
+                            height / sourceHeight
                         );
-
-                    } else if (fit === "stretch") {
-
-                        img.set({
-                            scaleX: width / img.width,
-                            scaleY: height / img.height
-                        });
-
-                        scale = null;
 
                     } else {
 
-                        // Default: cover
+                        /*
+                        * Cover is safest for rotation.
+                        */
                         scale = Math.max(
-                            width / img.width,
-                            height / img.height
+                            width / sourceWidth,
+                            height / sourceHeight
                         );
 
                     }
 
-                    if (scale !== null) {
-                        img.scale(scale);
-                    }
-
-                    const scaledWidth = img.getScaledWidth();
-                    const scaledHeight = img.getScaledHeight();
+                    img.scale(scale);
 
                     img.set({
+
+                        originX: "center",
+                        originY: "center",
+
                         left:
-                            left +
-                            (width - scaledWidth) / 2,
+                            left + width / 2,
 
                         top:
-                            top +
-                            (height - scaledHeight) / 2,
+                            top + height / 2,
+
+                        angle: rotation,
 
                         selectable: false,
                         evented: false,
@@ -165,6 +176,7 @@ const Canvas = (() => {
 
                         objectCaching: false,
                         photo: true
+
                     });
 
                     img.clipPath = new fabric.Rect({

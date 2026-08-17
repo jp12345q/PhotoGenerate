@@ -16,10 +16,6 @@ const Preview = (() => {
             .addEventListener("change", refresh);
 
         document
-            .getElementById("photoSize")
-            .addEventListener("change", refresh);
-
-        document
             .getElementById("rows")
             .addEventListener("change", refresh);
 
@@ -36,20 +32,6 @@ const Preview = (() => {
             .addEventListener("change", refresh);
 
         document
-        .getElementById("customWidth")
-        ?.addEventListener(
-            "input",
-            refresh
-        );
-
-        document
-        .getElementById("customHeight")
-        ?.addEventListener(
-            "input",
-            refresh
-        );
-
-        document
         .getElementById("noPhotoOkBtn")
         ?.addEventListener(
             "click",
@@ -58,10 +40,10 @@ const Preview = (() => {
 
     }
 
-    function refresh() {
+    async function refresh() {
 
-            const images =
-        Upload.getImages();
+        const images =
+            Upload.getImages();
 
         if (!images.length) {
 
@@ -89,11 +71,15 @@ const Preview = (() => {
         }
 
         if (paperType === "glossy") {
-            Packages.generate();
+
+            await Packages.generate();
+
         } else {
-            Layout.arrange(
+
+            await Layout.arrange(
                 Layout.getCurrentPage()
             );
+
         }
 
         const canvas = Canvas.getCanvas();

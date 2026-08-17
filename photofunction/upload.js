@@ -105,7 +105,18 @@ const Upload = (()=>{
                     width: 0,
                     height: 0,
                     cropped: false,
-                    backgroundRemoved: false
+                    backgroundRemoved: false,
+
+                    //Per-photo layout settings
+                    orientation: "auto",
+                    rotation: 0,
+
+                    photoSize: "2x2",
+
+                    customWidth: 2,
+                    customHeight: 2,
+
+                    fit: "contain"
                 });
                 console.log(imageLibrary.length);
 
@@ -171,6 +182,89 @@ const Upload = (()=>{
             () => {
 
                 selectedIndex = index;
+
+                const selectedPhoto =
+                    imageLibrary[selectedIndex];
+
+
+                /*
+                * Load this photo's saved size
+                */
+                const photoSizeSelect =
+                    document.getElementById(
+                        "photoSize"
+                    );
+
+                if (photoSizeSelect) {
+
+                    photoSizeSelect.value =
+                        selectedPhoto.photoSize ||
+                        "2x2";
+
+                }
+
+
+                /*
+                * Load this photo's orientation
+                */
+                const orientationSelect =
+                    document.getElementById(
+                        "photoOrientation"
+                    );
+
+                if (orientationSelect) {
+
+                    orientationSelect.value =
+                        selectedPhoto.orientation ||
+                        "auto";
+
+                }
+
+                const customWidth =
+                    document.getElementById(
+                        "customWidth"
+                    );
+
+                const customHeight =
+                    document.getElementById(
+                        "customHeight"
+                    );
+
+                if (customWidth) {
+
+                    customWidth.value =
+                        selectedPhoto.customWidth ||
+                        2;
+
+                }
+
+                if (customHeight) {
+
+                    customHeight.value =
+                        selectedPhoto.customHeight ||
+                        2;
+
+                }
+
+
+                /*
+                * Show Custom Size inputs
+                * only when this photo uses Custom.
+                */
+                const customGroup =
+                    document.getElementById(
+                        "customSizeGroup"
+                    );
+
+                if (customGroup) {
+
+                    customGroup.style.display =
+                        selectedPhoto.photoSize ===
+                        "custom"
+                            ? "block"
+                            : "none";
+
+                }
 
                 document
                     .querySelectorAll(

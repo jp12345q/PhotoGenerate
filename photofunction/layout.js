@@ -104,24 +104,50 @@ const Layout = (() => {
 
         }
 
-        const gap = CONFIG.LAYOUT.gap;
+        // ==========================================
+        // Mixed per-photo layout
+        // ==========================================
 
-        const gridWidth =
-            cols * photoWidth +
-            (cols - 1) * gap;
+        const gap =
+            CONFIG.LAYOUT.gap;
 
-        const gridHeight =
-            rows * photoHeight +
-            (rows - 1) * gap;
+        const margin = 20;
 
-        const startX =
-            (paper.width - gridWidth) / 2;
 
-        const startY =
-            (paper.height - gridHeight) / 2;
+        /*
+        * Available area inside the paper
+        */
+        const usableWidth =
+            paper.width -
+            (margin * 2);
 
+        const usableHeight =
+            paper.height -
+            (margin * 2);
+
+
+        /*
+        * Rows / Columns create fixed cells.
+        */
+        const cellWidth =
+            (
+                usableWidth -
+                (cols - 1) * gap
+            ) / cols;
+
+        const cellHeight =
+            (
+                usableHeight -
+                (rows - 1) * gap
+            ) / rows;
+
+
+        /*
+        * Current page photos
+        */
         const startIndex =
-            currentPage * photosPerPage;
+            currentPage *
+            photosPerPage;
 
         const pageImages =
             images.slice(
@@ -129,29 +155,165 @@ const Layout = (() => {
                 startIndex + photosPerPage
             );
 
-        const photoTasks = pageImages.map((photoData, index) => {
 
-            const row = Math.floor(index / cols);
-            const col = index % cols;
+        const photoTasks =
+            pageImages.map(
+                (photoData, index) => {
 
-            const left =
-                startX +
-                col * (photoWidth + gap);
+                    const row =
+                        Math.floor(
+                            index / cols
+                        );
 
-            const top =
-                startY +
-                row * (photoHeight + gap);
+                    const col =
+                        index % cols;
 
-            return Canvas.addPhoto({
-                src: photoData.src,
-                left,
-                top,
-                width: photoWidth,
-                height: photoHeight,
-                fit: "cover"
-            });
 
-        });
+                    // ==========================
+                    // THIS PHOTO'S SIZE
+                    // ==========================
+
+                    const sizeKey =
+                        photoData.photoSize ||
+                        photoKey ||
+                        "2x2";
+
+
+                    let itemWidth;
+                    let itemHeight;
+
+
+                    /*
+                    * Custom size
+                    */
+                    if (sizeKey === "custom") {
+
+                        const widthInches =
+                            Number(
+                                photoData.customWidth || 2
+                            );
+
+                        const heightInches =
+                            Number(
+                                photoData.customHeight || 2
+                            );
+
+                        itemWidth =
+                            widthInches * 96;
+
+                        itemHeight =
+                            heightInches * 96;
+
+                    }else {
+
+                        const size =
+                            CONFIG.PHOTO[
+                                sizeKey
+                            ];
+
+                        if (!size) {
+
+                            console.warn(
+                                "Unknown photo size:",
+                                sizeKey
+                            );
+
+                            return Promise.resolve();
+
+                        }
+
+                        itemWidth =
+                            mmToPx(
+                                size.width
+                            );
+
+                        itemHeight =
+                            mmToPx(
+                                size.height
+                            );
+
+                    }
+
+
+                    // ==========================
+                    // ORIENTATION
+                    // ==========================
+
+                    const landscape =
+                        photoData.orientation ===
+                        "landscape";
+
+
+                    /*
+                    * Swap print box dimensions.
+                    */
+                    if (landscape) {
+
+                        [
+                            itemWidth,
+                            itemHeight
+                        ] = [
+                            itemHeight,
+                            itemWidth
+                        ];
+
+                    }
+
+                    // ==========================
+                    // CELL POSITION
+                    // ==========================
+
+                    const cellLeft =
+                        margin +
+                        col *
+                        (cellWidth + gap);
+
+                    const cellTop =
+                        margin +
+                        row *
+                        (cellHeight + gap);
+
+
+                    /*
+                    * Center the REAL print size
+                    * inside this row/column cell.
+                    *
+                    * Do NOT resize it.
+                    */
+                    const left =
+                        cellLeft +
+                        (cellWidth - itemWidth) / 2;
+
+                    const top =
+                        cellTop +
+                        (cellHeight - itemHeight) / 2;
+
+
+                    /*
+                    * Draw this photo.
+                    */
+                    return Canvas.addPhoto({
+
+                        src: photoData.src,
+
+                        left,
+                        top,
+
+                        width: itemWidth,
+                        height: itemHeight,
+
+                        fit:
+                            photoData.fit ||
+                            "contain",
+
+                        rotation:
+                            photoData.rotation ||
+                            0
+
+                    });
+
+                }
+            );
 
         await Promise.all(photoTasks);
 
