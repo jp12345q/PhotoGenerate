@@ -262,6 +262,73 @@ button{
 
 }
 
+/*Package header */
+
+.package-card-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    margin-bottom:12px;
+
+}
+
+.package-card-header h2{
+
+    margin:0;
+
+}
+
+.package-settings-btn{
+
+    width:38px;
+
+    height:38px;
+
+    min-width:38px;
+
+    margin:0;
+
+    padding:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#f3f6f9;
+
+    color:#0f4c81;
+
+    font-size:18px;
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+
+}
+
+.package-settings-btn:hover{
+
+    background:#e2edf6;
+
+    transform:rotate(35deg);
+
+    box-shadow:
+        0 4px 12px
+        rgba(0,0,0,.12);
+
+}
+
 /* ==========================================
    Responsive
 ========================================== */

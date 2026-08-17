@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Upload.init();
     CropperTool.init();
     Background.init();
+    PackageSettings.init();
     Layout.init();
     Preview.init();
     PDF.init();
